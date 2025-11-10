@@ -31,6 +31,32 @@
         <a href="#creadoras">Creadoras</a>
         <a href="#login">Mi cuenta</a>
       </nav>
+      <div class="social-icons">
+        <a
+          class="icon ig"
+          href="https://instagram.com/madejadictas"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Instagram de madejadictas"
+          title="Instagram"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A5.5 5.5 0 1 1 6.5 13 5.5 5.5 0 0 1 12 7.5zm0 2A3.5 3.5 0 1 0 15.5 13 3.5 3.5 0 0 0 12 9.5zm5.75-3.25a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25z"/>
+          </svg>
+        </a>
+        <a
+          class="icon wa"
+          href="https://wa.me/56912345678?text=Hola%20madejadictas%20%F0%9F%8E%BC"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="WhatsApp de madejadictas"
+          title="WhatsApp"
+        >
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M19.11 17.43c-.3-.17-1.77-.96-2.05-1.08-.27-.1-.47-.16-.68.16-.2.3-.78 1.08-.96 1.3-.18.2-.35.22-.65.08-.3-.16-1.28-.47-2.44-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3 0-.47.13-.63.12-.12.3-.32.45-.48.15-.16.2-.27.3-.47.1-.2.05-.36 0-.5-.08-.16-.67-1.63-.92-2.24-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.5.08-.77.36-.27.3-1 1-.1 2.43.92 1.35 2.13 3 4.6 4.08 2.76 1.2 3.33.8 3.94.75.6-.05 1.94-.78 2.22-1.53.27-.73.27-1.35.2-1.48-.08-.13-.3-.2-.63-.38zM16.03 28.5h-.02c-2.15 0-4.27-.57-6.12-1.64l-4.3 1.13 1.15-4.2a12.54 12.54 0 01-1.82-6.54c0-6.91 5.62-12.54 12.54-12.54 3.35 0 6.5 1.3 8.87 3.66A12.44 12.44 0 0128.5 17.4c0 6.92-5.63 12.55-12.46 12.55zm0-22.58c-5.53 0-10.03 4.5-10.03 10.03 0 2.02.6 3.97 1.74 5.64l.27.4-.68 2.52 2.58-.67.39.23a10 10 0 004.73 1.27h.02c5.53 0 10.03-4.5 10.03-10.03 0-2.68-1.05-5.2-2.95-7.1a9.96 9.96 0 00-7.07-2.96z" />
+          </svg>
+        </a>
+      </div>
       <button class="pill-button ghost" data-scroll="#kits">
         Ver catálogo
       </button>
@@ -67,16 +93,12 @@
           </div>
           <div class="hero-badges">
             <div>
-              <span class="badge-number">1.2K+</span>
-              <p>Pedidos entregados</p>
+              <span class="badge-number">Mas de 2 años</span>
+              <p>de Showrooms</p>
             </div>
             <div>
-              <span class="badge-number">4.9/5</span>
-              <p>Valoración comunidad</p>
-            </div>
-            <div>
-              <span class="badge-number">48h</span>
-              <p>Despacho Santiago</p>
+              <span class="badge-number">Despachos</span>
+              <p>a todo chile</p>
             </div>
           </div>
         </div>
@@ -250,9 +272,6 @@
       </div>
     </dialog>
 
-    <script src="script.js" defer></script>
-  </body>
-</html>
     <dialog id="adminDialog" aria-label="Panel administrativo de madejadictas®">
       <div class="dialog-content admin">
         <div class="dialog-head">
@@ -261,32 +280,26 @@
             ×
           </button>
         </div>
-        <p class="helper-text">
-          Acceso exclusivo de Claudia Sepúlveda, Carla Sadoval y Héctor para subir
-          productos y revisar inventario.
-        </p>
-        <form id="adminAccessForm" class="admin-step">
-          <label>
-            ¿Quién ingresa?
-            <select name="owner" required>
-              <option value="">Selecciona</option>
-              <option value="Claudia">Claudia Sepúlveda</option>
-              <option value="Carla">Carla Sadoval</option>
-              <option value="Hector">Héctor (admin)</option>
-            </select>
-          </label>
-          <label>
-            Clave compartida
-            <input
-              type="password"
-              name="passcode"
-              placeholder="Ej: lanas+2024"
-              required
-              minlength="6"
-            />
-          </label>
-          <button type="submit" class="pill-button primary small">Desbloquear</button>
-        </form>
+        <div class="admin-auth">
+          <div id="teamProfile" hidden>
+            <p class="admin-status">
+              Conectada como <strong id="teamName"></strong>
+            </p>
+            <span id="teamEmail"></span>
+            <div class="team-actions">
+              <button class="pill-button secondary small" id="updateApiKeyButton">
+                Actualizar clave API
+              </button>
+              <button class="pill-button ghost small" id="signOutButton">
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+          <div id="googleButtonContainer"></div>
+          <p class="helper-text">
+            Acceso exclusivo para Claudia Sepúlveda, Carla Sadoval y Héctor usando su cuenta Google registrada.
+          </p>
+        </div>
 
         <form id="productForm" class="admin-form" hidden>
           <div class="two-col">
@@ -327,7 +340,7 @@
             <textarea name="notes" rows="3" placeholder="Tintorera, lote, variaciones..."></textarea>
           </label>
           <button type="submit" class="pill-button secondary small">
-            Guardar en inventario local
+            Publicar en catálogo
           </button>
         </form>
 
@@ -339,9 +352,18 @@
             </button>
           </div>
           <p class="helper-text">
-            Se guarda en tu navegador para validar datos antes de subirlos al backend.
+            Vemos aquí los productos registrados por el equipo en tiempo real.
           </p>
           <ul id="inventoryList"></ul>
         </section>
       </div>
     </dialog>
+
+    <script
+      src="https://accounts.google.com/gsi/client"
+      async
+      defer
+    ></script>
+    <script src="script.js" defer></script>
+  </body>
+</html>

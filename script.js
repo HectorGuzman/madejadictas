@@ -9,8 +9,8 @@ const products = [
     description: "400g · Degradé cobre/terracota · Tratamiento antipeeling",
     category: "lanas",
     image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
-    imageAlt: "Ovillos de lana merino en tonos tierra",
+      "https://source.unsplash.com/600x450/?yarn,wool,terracotta",
+    imageAlt: "Madejas de lana merino en tonos tierra",
   },
   {
     title: "Kit Chal Aurora",
@@ -19,8 +19,8 @@ const products = [
     description: "Nivel intermedio · Agujas 4mm · Acceso a video privado",
     category: "kits",
     image:
-      "https://images.unsplash.com/photo-1508047630978-887c2975095b?auto=format&fit=crop&w=600&q=80",
-    imageAlt: "Kit de chal con palillos circulares y madejas rosadas",
+      "https://source.unsplash.com/600x450/?yarn,shawl,knitting",
+    imageAlt: "Kit de chal con madejas y palillos",
   },
   {
     title: "Set marcadores 3D",
@@ -29,8 +29,8 @@ const products = [
     description: "12 piezas · PLA reciclado · Formas geométricas",
     category: "accesorios",
     image:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
-    imageAlt: "Accesorios de tejido sobre una mesa de madera clara",
+      "https://source.unsplash.com/600x450/?yarn,notions,knitting",
+    imageAlt: "Madejas y accesorios para tejido",
   },
   {
     title: "Algodón Pima Bloom",
@@ -39,8 +39,8 @@ const products = [
     description: "100% pima · DK · Paleta coral / miel / oliva",
     category: "lanas",
     image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80",
-    imageAlt: "Conos de algodón premium apilados",
+      "https://source.unsplash.com/600x450/?cotton,yarn",
+    imageAlt: "Madejas de algodón pima en colores suaves",
   },
   {
     title: "Kit Bucket minimal",
@@ -49,8 +49,8 @@ const products = [
     description: "Nivel básico · Crochet 5mm · Patrón descargable",
     category: "kits",
     image:
-      "https://images.unsplash.com/photo-1600180758890-6d763d6f7f4d?auto=format&fit=crop&w=600&q=80",
-    imageAlt: "Bolsa con madejas y ganchillo lista para tejer",
+      "https://source.unsplash.com/600x450/?crochet,yarn",
+    imageAlt: "Set de crochet con madejas listas para tejer",
   },
   {
     title: "Bloqueadores metálicos",
@@ -59,8 +59,8 @@ const products = [
     description: "Acero inoxidable · Set 30 piezas · Estuche lino",
     category: "accesorios",
     image:
-      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=600&q=80",
-    imageAlt: "Herramientas metálicas de tejido sobre fondo rosa",
+      "https://source.unsplash.com/600x450/?wool,yarn,needles",
+    imageAlt: "Madejas y herramientas de tejido",
   },
 ];
 
@@ -150,7 +150,13 @@ buildStamp.textContent = formatter.format(new Date());
 
 renderProducts();
 
-// Admin modal logic
+// Admin modal logic with Google sign-in
+const GOOGLE_CLIENT_ID = "TU_CLIENT_ID.apps.googleusercontent.com"; // Reemplaza con tu client_id real
+const AUTHORIZED_EMAILS = [
+  "claudia@madejadictas.com",
+  "carla@madejadictas.com",
+  "hector@madejadictas.com",
+].map((email) => email.toLowerCase());
 const ADMIN_HEADER = "x-admin-key";
 const ADMIN_KEY_STORAGE = "mdAdminKey";
 const INVENTORY_KEY = "mdInventory";
@@ -158,15 +164,37 @@ const INVENTORY_KEY = "mdInventory";
 const adminDialog = document.querySelector("#adminDialog");
 const openAdminPanel = document.querySelector("#openAdminPanel");
 const closeAdminDialog = document.querySelector("#closeAdminDialog");
-const adminAccessForm = document.querySelector("#adminAccessForm");
 const productForm = document.querySelector("#productForm");
 const inventoryPanel = document.querySelector("#inventoryPanel");
 const inventoryList = document.querySelector("#inventoryList");
 const clearInventoryButton = document.querySelector("#clearInventory");
+const googleButtonContainer = document.querySelector("#googleButtonContainer");
+const teamProfile = document.querySelector("#teamProfile");
+const teamName = document.querySelector("#teamName");
+const teamEmail = document.querySelector("#teamEmail");
+const signOutButton = document.querySelector("#signOutButton");
+const updateApiKeyButton = document.querySelector("#updateApiKeyButton");
 
+let inventory = [];
 let adminKey = localStorage.getItem(ADMIN_KEY_STORAGE) || "";
+let currentUser = null;
+let idToken = null;
+let googleReady = false;
 
-const loadInventory = () => {
+const parseJwt = (token) => {
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const jsonPayload = decodeURIComponent(
+    window
+      .atob(base64)
+      .split("")
+      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+      .join("")
+  );
+  return JSON.parse(jsonPayload);
+};
+
+const loadInventoryFromCache = () => {
   try {
     const stored = localStorage.getItem(INVENTORY_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -176,15 +204,21 @@ const loadInventory = () => {
   }
 };
 
-let inventory = loadInventory();
+const renderInventoryMessage = (text) => {
+  inventoryList.innerHTML = "";
+  const li = document.createElement("li");
+  li.style.color = "var(--muted)";
+  li.style.fontSize = "0.9rem";
+  li.textContent = text;
+  inventoryList.appendChild(li);
+};
 
 const renderInventory = () => {
   inventoryList.innerHTML = "";
   if (!inventory.length) {
-    const empty = document.createElement("li");
-    empty.textContent = "Aún no hay productos añadidos en este navegador.";
-    empty.style.color = "var(--muted)";
-    inventoryList.appendChild(empty);
+    renderInventoryMessage(
+      currentUser && idToken ? "Sin productos registrados todavía." : "Ingresa con Google para ver el inventario."
+    );
     return;
   }
 
@@ -195,27 +229,113 @@ const renderInventory = () => {
       <span>SKU: ${item.sku} · ${item.category}</span>
       <span>Precio: $${Number(item.price).toLocaleString("es-CL")} · Stock: ${item.stock}</span>
       ${item.notes ? `<span>Notas: ${item.notes}</span>` : ""}
-      <span>Registrado por ${item.owner} el ${item.createdAt}</span>
+      <span>Registrado por ${item.owner || "Equipo"} el ${item.createdAt}</span>
     `;
     inventoryList.appendChild(li);
   });
 };
 
-const toggleAdminForms = (isUnlocked) => {
-  adminAccessForm.hidden = isUnlocked;
-  productForm.hidden = !isUnlocked;
-  inventoryPanel.hidden = !isUnlocked;
+inventory = loadInventoryFromCache();
+renderInventory();
+
+const updateAdminUI = () => {
+  const isAuth = Boolean(currentUser && idToken);
+  productForm.hidden = !isAuth;
+  inventoryPanel.hidden = !isAuth;
+  clearInventoryButton.disabled = !isAuth;
+  if (teamProfile) teamProfile.hidden = !isAuth;
+  if (googleButtonContainer) {
+    googleButtonContainer.style.display = isAuth ? "none" : "flex";
+  }
+  if (updateApiKeyButton) updateApiKeyButton.hidden = !isAuth;
+
+  if (isAuth) {
+    teamName.textContent = currentUser.name || currentUser.email;
+    teamEmail.textContent = currentUser.email;
+    if (!inventory.length) renderInventoryMessage("Sin productos registrados todavía.");
+    else renderInventory();
+  } else {
+    teamEmail.textContent = "";
+    renderInventoryMessage("Ingresa con Google para ver el inventario.");
+  }
+};
+
+updateAdminUI();
+
+const handleCredentialResponse = (response) => {
+  try {
+    const payload = parseJwt(response.credential);
+    const email = payload.email?.toLowerCase();
+    if (!email || !AUTHORIZED_EMAILS.includes(email)) {
+      alert("Tu cuenta no tiene permisos para administrar el catálogo.");
+      return;
+    }
+    currentUser = {
+      name: payload.name || email,
+      email,
+      picture: payload.picture,
+    };
+    idToken = response.credential;
+    updateAdminUI();
+    fetchInventoryFromBackend();
+    if (!adminKey) {
+      configureApiKey();
+    }
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo validar tu sesión de Google.");
+  }
+};
+
+const initGoogleAuth = () => {
+  if (googleReady) return;
+  if (!window.google?.accounts?.id) return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleCredentialResponse,
+    auto_select: true,
+    use_fedcm_for_prompt: true,
+  });
+  if (googleButtonContainer) {
+    google.accounts.id.renderButton(googleButtonContainer, {
+      theme: "outline",
+      size: "large",
+      type: "standard",
+      shape: "pill",
+    });
+  }
+  googleReady = true;
+};
+
+window.addEventListener("load", initGoogleAuth);
+
+const configureApiKey = () => {
+  const value = prompt("Ingresa la clave API que comparte Héctor:", adminKey);
+  if (!value) return;
+  adminKey = value.trim();
+  localStorage.setItem(ADMIN_KEY_STORAGE, adminKey);
 };
 
 const fetchInventoryFromBackend = async () => {
+  if (!currentUser || !idToken) return;
   try {
-    const response = await fetch(`${API_BASE_URL}/api/products`);
-    if (!response.ok) return;
+    const response = await fetch(`${API_BASE_URL}/api/products`, {
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+        ...(adminKey ? { [ADMIN_HEADER]: adminKey } : {}),
+      },
+    });
+    if (!response.ok) {
+      if (response.status === 401) {
+        renderInventoryMessage("Tu sesión expiró, vuelve a conectarte.");
+      }
+      return;
+    }
     const { products } = await response.json();
-    if (Array.isArray(products) && products.length) {
+    if (Array.isArray(products)) {
       inventory = products.map((product) => ({
         ...product,
-        owner: product.owner || "Backend",
+        owner: product.owner || currentUser.name,
         createdAt:
           product.createdAt?.seconds
             ? new Date(product.createdAt.seconds * 1000).toLocaleString("es-CL")
@@ -229,50 +349,16 @@ const fetchInventoryFromBackend = async () => {
   }
 };
 
-openAdminPanel.addEventListener("click", () => {
-  toggleAdminForms(false);
-  adminAccessForm.reset();
-  if (adminKey) {
-    adminAccessForm.querySelector('input[name="passcode"]').value = adminKey;
-  }
-  productForm.reset();
-  adminDialog.showModal();
-  renderInventory();
-  fetchInventoryFromBackend();
-});
-
-closeAdminDialog.addEventListener("click", () => adminDialog.close());
-
-adminAccessForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const owner = formData.get("owner");
-  const passcode = formData.get("passcode")?.trim();
-
-  if (!owner) {
-    alert("Selecciona la persona que está ingresando.");
-    return;
-  }
-
-  if (!passcode) {
-    alert("Ingresa la clave compartida para acceder al backend.");
-    return;
-  }
-
-  adminKey = passcode;
-  localStorage.setItem(ADMIN_KEY_STORAGE, adminKey);
-
-  toggleAdminForms(true);
-  productForm.dataset.owner = owner;
-});
-
 const saveProductRemote = async (payload) => {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${idToken}`,
+  };
+  if (adminKey) headers[ADMIN_HEADER] = adminKey;
+
   const response = await fetch(`${API_BASE_URL}/api/products`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      [ADMIN_HEADER]: adminKey,
-    },
+    headers,
     body: JSON.stringify(payload),
   });
 
@@ -281,7 +367,7 @@ const saveProductRemote = async (payload) => {
     try {
       const data = await response.json();
       detail = data.error || JSON.stringify(data);
-    } catch (error) {
+    } catch (_) {
       // ignored
     }
     throw new Error(detail);
@@ -292,9 +378,13 @@ const saveProductRemote = async (payload) => {
 
 productForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!adminKey) {
-    alert("Primero desbloquea el panel con tu clave.");
+  if (!currentUser || !idToken) {
+    alert("Inicia sesión con Google para publicar productos.");
     return;
+  }
+  if (!adminKey) {
+    configureApiKey();
+    if (!adminKey) return;
   }
 
   const formData = new FormData(event.target);
@@ -321,13 +411,12 @@ productForm.addEventListener("submit", async (event) => {
     const { product } = await saveProductRemote(payload);
     const storedItem = {
       ...product,
-      owner: productForm.dataset.owner || "Admin",
+      owner: currentUser.name || currentUser.email,
       createdAt: new Intl.DateTimeFormat("es-CL", {
         dateStyle: "medium",
         timeStyle: "short",
       }).format(new Date()),
     };
-
     inventory = [storedItem, ...inventory];
     localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
     renderInventory();
@@ -341,9 +430,35 @@ productForm.addEventListener("submit", async (event) => {
 
 clearInventoryButton.addEventListener("click", () => {
   if (!inventory.length) return;
-  const confirmed = confirm("¿Seguro que quieres limpiar el inventario local?");
+  const confirmed = confirm("¿Seguro que quieres limpiar la vista local?");
   if (!confirmed) return;
   inventory = [];
   localStorage.removeItem(INVENTORY_KEY);
-  renderInventory();
+  renderInventoryMessage("Sin productos registrados todavía.");
 });
+
+const signOut = () => {
+  if (window.google?.accounts?.id && currentUser?.email) {
+    google.accounts.id.revoke(currentUser.email, () => {});
+    google.accounts.id.disableAutoSelect();
+  }
+  currentUser = null;
+  idToken = null;
+  updateAdminUI();
+};
+
+signOutButton.addEventListener("click", signOut);
+if (updateApiKeyButton) updateApiKeyButton.addEventListener("click", configureApiKey);
+
+openAdminPanel.addEventListener("click", () => {
+  initGoogleAuth();
+  adminDialog.showModal();
+  updateAdminUI();
+  if (currentUser && idToken) {
+    fetchInventoryFromBackend();
+  } else if (window.google?.accounts?.id) {
+    google.accounts.id.prompt();
+  }
+});
+
+closeAdminDialog.addEventListener("click", () => adminDialog.close());

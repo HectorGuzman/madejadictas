@@ -94,6 +94,42 @@ button {
   color: var(--accent);
 }
 
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.25rem;
+}
+
+.social-icons .icon {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.social-icons .icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.social-icons .icon.ig svg {
+  fill: var(--accent);
+}
+
+.social-icons .icon.wa svg {
+  fill: #25d366;
+}
+
+.social-icons .icon:hover {
+  border-color: var(--accent-soft);
+}
+
 .menu-toggle {
   display: none;
   flex-direction: column;
@@ -544,14 +580,12 @@ dialog::backdrop {
   cursor: pointer;
 }
 
-.admin-step,
 .admin-form {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.admin-step label,
 .admin-form label {
   display: flex;
   flex-direction: column;
@@ -559,16 +593,50 @@ dialog::backdrop {
   font-size: 0.9rem;
 }
 
-.admin-step input,
 .admin-form input,
 .admin-form textarea,
-.admin-step select,
 .admin-form select {
   border-radius: 0.75rem;
   border: 1px solid var(--line);
   padding: 0.55rem 0.8rem;
   font: inherit;
   background: #fffdfc;
+}
+
+.admin-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#teamProfile {
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 214, 210, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-status {
+  margin: 0;
+}
+
+#teamEmail {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+#googleButtonContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.team-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .admin-form .two-col {

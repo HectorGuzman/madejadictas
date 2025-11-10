@@ -9,6 +9,17 @@ Proyecto base estático listo para publicarse en GitHub Pages. Contiene hero res
 - `script.js`: datos de ejemplo para el catálogo, filtros, diálogo de flujo y helpers (smooth scroll, sello de build, menú mobile).
 - `backend/`: API Express lista para Cloud Run + Cloud Firestore (`backend/README.md` tiene los pasos).
 
+## Autenticación del equipo
+
+1. **Google Identity Services**
+   - Crea un OAuth Client ID tipo “Web” en Google Cloud Console y copia el `client_id`.
+   - Reemplaza el valor de `GOOGLE_CLIENT_ID` en `script.js` con tu identificador real.
+   - Ajusta el arreglo `AUTHORIZED_EMAILS` para que sólo los correos de Claudia, Carla y Héctor puedan abrir el panel.
+2. **Clave de API interna**
+   - La primera vez que cada integrante se conecte deberá ingresar la clave API que se guarda en su navegador (se sigue enviando en el header `x-admin-key` hasta que migremos la protección al token de Google).
+3. **Flujo**
+   - Desde la landing pulsa “Panel Claudia & Carla”, inicia sesión con Google y automáticamente se desbloquean el formulario y el inventario sincronizado contra el backend.
+
 ## Ver localmente
 
 1. Clona este repo y abre `index.html` en tu navegador, o levanta un servidor estático:
