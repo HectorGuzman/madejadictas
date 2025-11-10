@@ -1,0 +1,23 @@
+{
+  "name": "madejadictas-backend",
+  "version": "0.1.0",
+  "description": "API de soporte para madejadictas® desplegable en Cloud Run / Cloud Build.",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.5.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

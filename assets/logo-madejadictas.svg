@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 220" role="img" aria-label="Logo original madejadictas">
+  <defs>
+    <style>
+      .brand {
+        fill: none;
+        stroke: #e0202c;
+        stroke-width: 6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .fill {
+        fill: #e0202c;
+      }
+      .light {
+        stroke: #fff6f6;
+        stroke-width: 4;
+        fill: none;
+      }
+      .heart {
+        fill: #fff6f6;
+      }
+      text {
+        font-family: "Space Grotesk", "Gill Sans", system-ui, sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        fill: #e0202c;
+      }
+    </style>
+  </defs>
+
+  <!-- marco superior e inferior -->
+  <path
+    class="brand"
+    d="M60 60 H220 M340 60 H500 M60 60 V178 H500 V60"
+  />
+
+  <!-- madejas -->
+  <g transform="translate(240 45)">
+    <g>
+      <path
+        d="M0 0 H60 C74 0 84 10 84 28 V112 C84 130 74 140 60 140 H0 C-14 140 -24 130 -24 112 V28 C-24 10 -14 0 0 0 Z"
+        class="fill"
+      />
+      <path d="M-18 28 Q30 18 78 28" class="light" />
+      <path d="M-20 56 Q30 46 82 56" class="light" />
+      <path d="M-22 86 Q30 76 84 86" class="light" />
+      <path d="M-18 112 Q30 122 78 112" class="light" />
+      <path
+        d="M-10 16 C0 40 0 98 -10 122"
+        class="light"
+      />
+      <path
+        d="M70 16 C60 40 60 98 70 122"
+        class="light"
+      />
+    </g>
+    <g transform="translate(98)">
+      <path
+        d="M0 0 H52 C66 0 76 10 76 28 V112 C76 130 66 140 52 140 H0 C-14 140 -24 130 -24 112 V28 C-24 10 -14 0 0 0 Z"
+        class="fill"
+      />
+      <path d="M-18 28 Q24 18 66 28" class="light" />
+      <path d="M-20 56 Q24 46 68 56" class="light" />
+      <path d="M-22 86 Q24 76 70 86" class="light" />
+      <path d="M-18 112 Q24 122 66 112" class="light" />
+      <path
+        d="M-8 14 C2 38 2 100 -8 124"
+        class="light"
+      />
+      <path
+        d="M58 14 C48 38 48 100 58 124"
+        class="light"
+      />
+      <path
+        d="M26 60 C20 50 4 50 4 66 C4 82 26 98 26 98 C26 98 48 82 48 66 C48 50 32 50 26 60 Z"
+        class="heart"
+      />
+    </g>
+  </g>
+
+  <text x="280" y="188" font-size="30" text-anchor="middle">
+    madejadictas
+  </text>
+</svg>

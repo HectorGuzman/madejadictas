@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>madejadictas® | Insumos para tejido y kits creativos</title>
+    <meta
+      name="description"
+      content="Catálogo online de madejadictas®: lanas, hilos, accesorios y kits para tejedoras. Compra como invitada o inicia sesión con Google."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="logo">
+        <img src="assets/logo.JPG" alt="Logo original de madejadictas®" />
+        <div>
+          <strong>madejadictas®</strong>
+          <p>Vendemos solo lo que nos gusta</p>
+        </div>
+      </div>
+      <nav class="main-nav">
+        <a href="#productos">Productos</a>
+        <a href="#kits">Kits</a>
+        <a href="#creadoras">Creadoras</a>
+        <a href="#login">Mi cuenta</a>
+      </nav>
+      <button class="pill-button ghost" data-scroll="#kits">
+        Ver catálogo
+      </button>
+      <button class="menu-toggle" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">Selección continua · stock limitado</p>
+          <h1>
+            Todo lo que necesitas para
+            <span class="accent">tejer sin enredos.</span>
+          </h1>
+          <p class="lead">
+            Lanas premium de teñidoras chilenas, kits curados, accesorios y
+            artículos que acompañan el tejer para que cada sesión sea cómoda,
+            bella y perfectamente testeada. Desde la IV Región (La
+            Serena/Coquimbo) despachamos envíos por pagar a todo Chile.
+            madejadictas® es marca registrada en Chile.
+          </p>
+          <div class="hero-cta">
+            <button class="pill-button primary" data-scroll="#productos">
+              Explorar novedades
+            </button>
+            <button class="pill-button secondary" data-scroll="#kits">
+              Armar mi kit
+            </button>
+            <button class="pill-button admin-launcher" id="openAdminPanel">
+              Panel Claudia & Carla
+            </button>
+          </div>
+          <div class="hero-badges">
+            <div>
+              <span class="badge-number">1.2K+</span>
+              <p>Pedidos entregados</p>
+            </div>
+            <div>
+              <span class="badge-number">4.9/5</span>
+              <p>Valoración comunidad</p>
+            </div>
+            <div>
+              <span class="badge-number">48h</span>
+              <p>Despacho Santiago</p>
+            </div>
+          </div>
+        </div>
+        <div class="hero-card">
+          <h3>Clase en vivo: Punto brioche</h3>
+          <p>Incluye kit con materiales + acceso al streaming.</p>
+          <ul>
+            <li>Domingo 21 · 10:30 hrs</li>
+            <li>Profesora: Vale Torres</li>
+            <li>Cupo: 25 tejedoras</li>
+          </ul>
+          <button class="pill-button ghost small">Reservar cupo</button>
+        </div>
+      </section>
+
+      <section class="product-showcase" id="productos">
+        <div class="section-heading">
+          <p class="eyebrow">Selección curada</p>
+          <h2>Nuevos favoritos de la semana</h2>
+          <p>
+            Mezclamos fibras naturales, colores exclusivos y herramientas
+            esenciales. Cada producto incluye fichas técnicas descargables.
+          </p>
+        </div>
+        <div class="filters">
+          <button class="chip active" data-filter="todos">Todos</button>
+          <button class="chip" data-filter="lanas">Lanas</button>
+          <button class="chip" data-filter="accesorios">Accesorios</button>
+          <button class="chip" data-filter="kits">Kits guiados</button>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+      </section>
+
+      <section class="kits-section" id="kits">
+        <div class="kits-copy">
+          <p class="eyebrow">Personaliza tu experiencia</p>
+          <h2>Kits diseñados para tu ritmo</h2>
+          <p>
+            Selecciona nivel, técnica y tiempo disponible. Te proponemos
+            combinaciones de colores y enviamos todo listo para tejer.
+          </p>
+          <ul class="kit-benefits">
+            <li>Video paso a paso + guía descargable</li>
+            <li>Soporte por WhatsApp para dudas técnicas</li>
+            <li>Recomendaciones de complementos y cuidado</li>
+          </ul>
+          <button class="pill-button primary">Simular kit</button>
+        </div>
+        <div class="kits-card" aria-label="Detalle del kit destacado">
+          <div class="kit-palette">
+            <span class="swatch terracotta"></span>
+            <span class="swatch honey"></span>
+            <span class="swatch sage"></span>
+            <span class="swatch cloud"></span>
+          </div>
+          <div class="kit-details">
+            <p class="eyebrow">Kit destacado</p>
+            <h3>Suéter Andes</h3>
+            <p class="lead">Tiempo estimado: 12h · Nivel intermedio</p>
+            <div class="kit-includes">
+              <p>Incluye:</p>
+              <ul>
+                <li>500g Merino DK + degradé</li>
+                <li>Palillos circulares 4.5mm</li>
+                <li>Marcadores + bolsa de lino</li>
+              </ul>
+            </div>
+            <button class="pill-button secondary small">Ver instrucciones</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="creators" id="creadoras">
+        <div class="section-heading">
+          <p class="eyebrow">Círculo de creadoras</p>
+          <h2>Conoce a las tejedoras detrás de madejadictas®</h2>
+        </div>
+        <div class="creator-grid">
+          <article class="creator-card">
+            <div
+              class="avatar photo"
+              style="background-image: url('assets/Clau.JPG')"
+            ></div>
+            <h3>Claudia Sepúlveda</h3>
+            <p>
+              Tejedora incansable, tester obsesiva y amante declarada de los
+              diseños delicados que cuentan historias.
+            </p>
+            <a
+              href="https://instagram.com/clau.knits"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @clau.knits
+            </a>
+          </article>
+          <article class="creator-card">
+            <div
+              class="avatar photo"
+              style="background-image: url('assets/Carla.JPG')"
+            ></div>
+            <h3>Carla Sadoval</h3>
+            <p>
+              Enamorada del buen diseño, maniática del tejido diario y tester
+              serial que documenta cada puntada.
+            </p>
+            <a
+              href="https://instagram.com/knitdealer"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @knitdealer
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section class="account-section" id="login">
+        <div class="section-heading">
+          <p class="eyebrow">Compra cómo prefieras</p>
+          <h2>Ingresa con Google o sigue como invitada</h2>
+          <p>
+            El login permite guardar direcciones, listas de favoritos y seguir
+            el progreso de tus proyectos. También puedes comprar rápido como
+            invitada sin crear cuenta.
+          </p>
+        </div>
+        <div class="account-actions">
+          <button class="pill-button primary large" id="googleLoginButton">
+            <span class="material-icon">G</span>Continuar con Google
+          </button>
+          <button class="pill-button secondary large" id="guestCheckoutButton">
+            Comprar como invitada
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>madejadictas®</strong>
+        <p>La Serena / Coquimbo · Envíos por pagar a todo Chile</p>
+      </div>
+      <div class="footer-links">
+        <a href="#">Políticas</a>
+        <a href="#">Preguntas frecuentes</a>
+        <a href="mailto:hola@madejadictas.com">hola@madejadictas.com</a>
+        <a
+          href="https://instagram.com/madejadictas"
+          target="_blank"
+          rel="noopener noreferrer"
+          >@madejadictas</a
+        >
+      </div>
+      <p class="footer-note">
+        Catálogo listo para GitHub Pages • Actualizado
+        <span id="buildStamp"></span>
+      </p>
+    </footer>
+
+    <dialog id="flowDialog">
+      <div class="dialog-content">
+        <h3 id="dialogTitle">Flujo próximo</h3>
+        <p id="dialogMessage">
+          Aquí renderizaremos el flujo real una vez se configure Google Identity
+          Services.
+        </p>
+        <button class="pill-button primary small" id="closeDialog">
+          Cerrar
+        </button>
+      </div>
+    </dialog>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
+    <dialog id="adminDialog" aria-label="Panel administrativo de madejadictas®">
+      <div class="dialog-content admin">
+        <div class="dialog-head">
+          <h3>Panel de catálogo</h3>
+          <button class="close-button" id="closeAdminDialog" aria-label="Cerrar panel">
+            ×
+          </button>
+        </div>
+        <p class="helper-text">
+          Acceso exclusivo de Claudia Sepúlveda, Carla Sadoval y Héctor para subir
+          productos y revisar inventario.
+        </p>
+        <form id="adminAccessForm" class="admin-step">
+          <label>
+            ¿Quién ingresa?
+            <select name="owner" required>
+              <option value="">Selecciona</option>
+              <option value="Claudia">Claudia Sepúlveda</option>
+              <option value="Carla">Carla Sadoval</option>
+              <option value="Hector">Héctor (admin)</option>
+            </select>
+          </label>
+          <label>
+            Clave compartida
+            <input
+              type="password"
+              name="passcode"
+              placeholder="Ej: lanas+2024"
+              required
+              minlength="6"
+            />
+          </label>
+          <button type="submit" class="pill-button primary small">Desbloquear</button>
+        </form>
+
+        <form id="productForm" class="admin-form" hidden>
+          <div class="two-col">
+            <label>
+              Nombre del producto
+              <input type="text" name="title" required />
+            </label>
+            <label>
+              SKU / Código
+              <input type="text" name="sku" required />
+            </label>
+          </div>
+          <div class="two-col">
+            <label>
+              Precio (CLP)
+              <input type="number" name="price" inputmode="numeric" required />
+            </label>
+            <label>
+              Stock disponible
+              <input type="number" name="stock" min="0" required />
+            </label>
+          </div>
+          <label>
+            Categoría
+            <select name="category" required>
+              <option value="">Selecciona</option>
+              <option value="lanas">Lanas</option>
+              <option value="kits">Kits</option>
+              <option value="accesorios">Accesorios</option>
+            </select>
+          </label>
+          <label>
+            URL de foto (opcional)
+            <input type="url" name="image" placeholder="https://..." />
+          </label>
+          <label>
+            Notas internas
+            <textarea name="notes" rows="3" placeholder="Tintorera, lote, variaciones..."></textarea>
+          </label>
+          <button type="submit" class="pill-button secondary small">
+            Guardar en inventario local
+          </button>
+        </form>
+
+        <section id="inventoryPanel" class="inventory-panel" hidden>
+          <div class="inventory-head">
+            <h4>Inventario temporal</h4>
+            <button class="pill-button ghost small" id="clearInventory">
+              Limpiar lista
+            </button>
+          </div>
+          <p class="helper-text">
+            Se guarda en tu navegador para validar datos antes de subirlos al backend.
+          </p>
+          <ul id="inventoryList"></ul>
+        </section>
+      </div>
+    </dialog>
