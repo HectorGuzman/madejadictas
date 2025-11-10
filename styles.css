@@ -118,6 +118,12 @@ button {
   height: 1.15rem;
 }
 
+.social-icons .icon-img {
+  width: 1.15rem;
+  height: 1.15rem;
+  display: block;
+}
+
 .social-icons .icon.ig svg {
   fill: var(--accent);
 }
