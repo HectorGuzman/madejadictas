@@ -1,3 +1,6 @@
+
+const API_BASE_URL = "https://madejadictas-api-mqjpwzxwma-uc.a.run.app";
+
 const products = [
   {
     title: "Merino DK Andes",
@@ -148,6 +151,10 @@ buildStamp.textContent = formatter.format(new Date());
 renderProducts();
 
 // Admin modal logic
+const ADMIN_HEADER = "x-admin-key";
+const ADMIN_KEY_STORAGE = "mdAdminKey";
+const INVENTORY_KEY = "mdInventory";
+
 const adminDialog = document.querySelector("#adminDialog");
 const openAdminPanel = document.querySelector("#openAdminPanel");
 const closeAdminDialog = document.querySelector("#closeAdminDialog");
@@ -157,8 +164,7 @@ const inventoryPanel = document.querySelector("#inventoryPanel");
 const inventoryList = document.querySelector("#inventoryList");
 const clearInventoryButton = document.querySelector("#clearInventory");
 
-const ACCESS_CODE = "lanalovers2024";
-const INVENTORY_KEY = "mdInventory";
+let adminKey = localStorage.getItem(ADMIN_KEY_STORAGE) || "";
 
 const loadInventory = () => {
   try {
@@ -201,12 +207,38 @@ const toggleAdminForms = (isUnlocked) => {
   inventoryPanel.hidden = !isUnlocked;
 };
 
+const fetchInventoryFromBackend = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/products`);
+    if (!response.ok) return;
+    const { products } = await response.json();
+    if (Array.isArray(products) && products.length) {
+      inventory = products.map((product) => ({
+        ...product,
+        owner: product.owner || "Backend",
+        createdAt:
+          product.createdAt?.seconds
+            ? new Date(product.createdAt.seconds * 1000).toLocaleString("es-CL")
+            : new Date().toLocaleString("es-CL"),
+      }));
+      localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+      renderInventory();
+    }
+  } catch (error) {
+    console.warn("No se pudo sincronizar inventario remoto", error);
+  }
+};
+
 openAdminPanel.addEventListener("click", () => {
   toggleAdminForms(false);
   adminAccessForm.reset();
+  if (adminKey) {
+    adminAccessForm.querySelector('input[name="passcode"]').value = adminKey;
+  }
   productForm.reset();
   adminDialog.showModal();
   renderInventory();
+  fetchInventoryFromBackend();
 });
 
 closeAdminDialog.addEventListener("click", () => adminDialog.close());
@@ -215,35 +247,96 @@ adminAccessForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const formData = new FormData(event.target);
   const owner = formData.get("owner");
-  const passcode = formData.get("passcode");
+  const passcode = formData.get("passcode")?.trim();
 
   if (!owner) {
     alert("Selecciona la persona que está ingresando.");
     return;
   }
-  if (passcode !== ACCESS_CODE) {
-    alert("Clave incorrecta. Pídele a Héctor la clave actualizada.");
+
+  if (!passcode) {
+    alert("Ingresa la clave compartida para acceder al backend.");
     return;
   }
+
+  adminKey = passcode;
+  localStorage.setItem(ADMIN_KEY_STORAGE, adminKey);
 
   toggleAdminForms(true);
   productForm.dataset.owner = owner;
 });
 
-productForm.addEventListener("submit", (event) => {
+const saveProductRemote = async (payload) => {
+  const response = await fetch(`${API_BASE_URL}/api/products`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      [ADMIN_HEADER]: adminKey,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    let detail = "Error al guardar producto";
+    try {
+      const data = await response.json();
+      detail = data.error || JSON.stringify(data);
+    } catch (error) {
+      // ignored
+    }
+    throw new Error(detail);
+  }
+
+  return response.json();
+};
+
+productForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (!adminKey) {
+    alert("Primero desbloquea el panel con tu clave.");
+    return;
+  }
+
   const formData = new FormData(event.target);
   const entry = Object.fromEntries(formData.entries());
-  entry.owner = productForm.dataset.owner || "Admin";
-  entry.createdAt = new Intl.DateTimeFormat("es-CL", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date());
+  const payload = {
+    title: entry.title?.trim(),
+    sku: entry.sku?.trim(),
+    price: Number(entry.price),
+    stock: Number(entry.stock),
+    category: entry.category,
+    image: entry.image?.trim(),
+    notes: entry.notes?.trim(),
+  };
 
-  inventory = [entry, ...inventory];
-  localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-  renderInventory();
-  event.target.reset();
+  if (!payload.title || !payload.sku || Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
+    alert("Completa nombre, SKU, precio y stock antes de guardar.");
+    return;
+  }
+
+  if (!payload.image) delete payload.image;
+  if (!payload.notes) delete payload.notes;
+
+  try {
+    const { product } = await saveProductRemote(payload);
+    const storedItem = {
+      ...product,
+      owner: productForm.dataset.owner || "Admin",
+      createdAt: new Intl.DateTimeFormat("es-CL", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date()),
+    };
+
+    inventory = [storedItem, ...inventory];
+    localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+    renderInventory();
+    event.target.reset();
+    alert("Producto enviado al backend de madejadictas®.");
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "No pudimos guardar el producto, intenta nuevamente.");
+  }
 });
 
 clearInventoryButton.addEventListener("click", () => {
