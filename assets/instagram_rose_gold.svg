@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="roseGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b76e79"/>
+      <stop offset="40%" stop-color="#d7a1a9"/>
+      <stop offset="60%" stop-color="#e6b7b1"/>
+      <stop offset="100%" stop-color="#b76e79"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  <!-- Rounded square outline -->
+  <rect x="162" y="162" width="700" height="700" rx="210" ry="210"
+        fill="none" stroke="url(#roseGold)" stroke-width="80" filter="url(#softShadow)"/>
+  <!-- Large lens circle -->
+  <circle cx="512" cy="512" r="180" fill="none" stroke="url(#roseGold)" stroke-width="80" filter="url(#softShadow)"/>
+  <!-- Small top-right circle -->
+  <circle cx="714" cy="324" r="40" fill="url(#roseGold)" filter="url(#softShadow)"/>
+</svg>
