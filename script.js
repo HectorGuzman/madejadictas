@@ -475,24 +475,41 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// Easter egg: 5 clics rápidos en el logo abre admin
+// Easter egg: acceso oculto al panel admin
 (() => {
   const logo = document.querySelector(".logo");
   if (!logo) return;
   let clicks = 0;
-  let timer = null;
+  let resetTimer = null;
+  let pressTimer = null;
+
+  const openAdmin = () => (window.location.href = "admin.html");
+
+  // 5 clics en 4 segundos
   logo.addEventListener("click", () => {
     clicks += 1;
-    clearTimeout(timer);
+    clearTimeout(resetTimer);
     if (clicks >= 5) {
-      window.location.href = "admin.html";
       clicks = 0;
+      openAdmin();
       return;
     }
-    timer = setTimeout(() => {
+    resetTimer = setTimeout(() => {
       clicks = 0;
-    }, 1200);
+    }, 4000);
   });
+
+  // Long-press (1.2s) como alternativa (móvil)
+  const startPress = () => {
+    clearTimeout(pressTimer);
+    pressTimer = setTimeout(openAdmin, 1200);
+  };
+  const cancelPress = () => clearTimeout(pressTimer);
+  logo.addEventListener("mousedown", startPress);
+  logo.addEventListener("mouseup", cancelPress);
+  logo.addEventListener("mouseleave", cancelPress);
+  logo.addEventListener("touchstart", startPress, { passive: true });
+  logo.addEventListener("touchend", cancelPress);
 })();
 
 // Se movió el panel admin a admin.html (admin.js)
