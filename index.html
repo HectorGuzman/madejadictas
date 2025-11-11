@@ -53,7 +53,7 @@
           <img src="assets/whatsapp_rose_gold.svg" alt="WhatsApp" class="icon-img" />
         </a>
       </div>
-      <button class="pill-button ghost" data-scroll="#productos">
+      <button class="pill-button ghost header-cta" data-scroll="#productos">
         Ver catálogo
       </button>
       <button class="menu-toggle" aria-label="Abrir menú">
@@ -76,30 +76,22 @@
             Serena/Coquimbo) despachamos envíos por pagar a todo Chile.
             madejadictas® es marca registrada en Chile.
           </p>
-          <div class="hero-cta">
-            <button class="pill-button primary" data-scroll="#productos">
-              Explorar novedades
-            </button>
-            <button class="pill-button secondary" data-scroll="#productos">
-              Ver todos los productos
-            </button>
-            
-          </div>
+          
           <div class="hero-badges">
             <div>
-              <span class="badge-number">Mas de 2 años</span>
-              <p>de Showrooms</p>
+              <span class="badge-number">Más de 2 años</span>
+              <p>de encuentros donde conversamos y somos felices viendo lanas</p>
             </div>
             <div>
-              <span class="badge-number">Despachos</span>
-              <p>a todo chile</p>
+              <span class="badge-number">Despachos a todo Chile</span>
+              <p>con atención y asesoría de sus dueñas</p>
             </div>
           </div>
         </div>
-        <div class="hero-card" id="bestsellerCard">
-          <h3>Más vendido</h3>
-          <p>Muy pronto destacaremos nuestro favorito de la semana.</p>
-          <button class="pill-button ghost small" data-scroll="#productos">Ver catálogo</button>
+        <div class="hero-card" id="showroomHero">
+          <h3>Último showroom</h3>
+          <p>Muy pronto destacaremos fotos y detalles de nuestro encuentro más reciente.</p>
+          <button class="pill-button ghost small" data-scroll="#showrooms">Ver showrooms</button>
         </div>
       </section>
 
@@ -206,9 +198,6 @@
         </div>
         <div class="account-actions">
           <div id="googleButtonContainerLanding"></div>
-          <button class="pill-button primary large" id="googleLoginButton">
-            <span class="material-icon">G</span>Continuar con Google
-          </button>
           <button class="pill-button secondary large" id="guestCheckoutButton">
             Comprar como invitada
           </button>
@@ -224,7 +213,7 @@
           </div>
         </div>
 
-        <form id="accountForm" class="admin-form" aria-label="Datos para despacho">
+        <form id="accountForm" class="admin-form" aria-label="Datos para despacho" hidden>
           <div class="two-col">
             <label>
               Nombre completo

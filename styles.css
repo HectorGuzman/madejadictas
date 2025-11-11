@@ -269,6 +269,10 @@ h3 {
   color: var(--ink);
 }
 
+.header-cta {
+  margin-left: 0.25rem;
+}
+
 .pill-button.small {
   padding: 0.4rem 1rem;
   font-size: 0.85rem;
@@ -585,6 +589,15 @@ h3 {
   gap: 1rem;
   flex-wrap: wrap;
   margin: 1.5rem 0;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Centrar botón de Google en la landing */
+#googleButtonContainerLanding {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .material-icon {
@@ -831,6 +844,10 @@ dialog::backdrop {
     display: inline-flex;
     margin-left: auto;
   }
+
+  .header-cta {
+    order: 3;
+  }
 }
 
 @media (max-width: 640px) {
@@ -854,4 +871,10 @@ dialog::backdrop {
   .footer-note {
     text-align: left;
   }
+
+  /* Mostrar iconos sociales también en móvil */
+  .social-icons { display: flex; }
+
+  /* Header minimalista en móvil: ocultar CTA secundario */
+  .header-cta { display: none; }
 }

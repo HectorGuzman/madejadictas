@@ -5,6 +5,11 @@ let products = [];
 
 const productGrid = document.querySelector("#productGrid");
 const CART_KEY = 'mdCart';
+// Showrooms selectors/estado (debe declararse antes de usarse)
+const showroomGrid = document.querySelector('#showroomGrid');
+let showroomsData = [];
+let currentShowroom = null;
+let currentSrIndex = 0;
 const filterChips = document.querySelectorAll(".chip");
 let activeFilter = "todos";
 
@@ -111,6 +116,15 @@ function updateAccountUI() {
   if (googleBtnContainerLanding) googleBtnContainerLanding.style.display = isAuth ? "none" : "flex";
   if (googleLoginButton) googleLoginButton.style.display = isAuth ? "none" : "inline-flex";
   if (accountProfile) accountProfile.hidden = !isAuth;
+  // Mostrar el formulario solo tras una acción: login (isAuth) o click en "Comprar como invitada"
+  if (accountForm) {
+    if (isAuth) {
+      accountForm.hidden = false;
+    } else {
+      // Si no hay sesión, permanece oculto hasta que se pulse el botón de invitada
+      accountForm.hidden = true;
+    }
+  }
   if (isAuth) {
     accountName.textContent = landingUser.name || landingUser.email;
     accountEmail.textContent = landingUser.email || "";
@@ -182,12 +196,14 @@ if (signOutLanding) {
       google.accounts.id.disableAutoSelect();
     }
     updateAccountUI();
+    if (accountForm) accountForm.hidden = true;
   });
 }
 
 if (guestCheckoutButton) {
   guestCheckoutButton.addEventListener("click", () => {
     // Enfoca el formulario y resalta
+    if (accountForm) accountForm.hidden = false;
     accountForm?.scrollIntoView({ behavior: 'smooth' });
     const first = accountForm?.querySelector('input[name="fullName"]');
     if (first) first.focus();
@@ -360,30 +376,27 @@ const formatter = new Intl.DateTimeFormat("es-CL", {
 buildStamp.textContent = formatter.format(new Date());
 
 // Rellena la tarjeta de "Más vendido" en el hero
-function renderBestseller() {
-  const holder = document.querySelector('#bestsellerCard');
+function renderShowroomHero() {
+  const holder = document.querySelector('#showroomHero');
   if (!holder) return;
-  if (!Array.isArray(products) || products.length === 0) {
+  if (!Array.isArray(showroomsData) || showroomsData.length === 0) {
     holder.innerHTML = `
-      <h3>Más vendido</h3>
-      <p>Muy pronto destacaremos nuestro favorito de la semana.</p>
-      <button class="pill-button ghost small" data-scroll="#productos">Ver catálogo</button>
+      <h3>Último showroom</h3>
+      <p>Muy pronto destacaremos fotos y detalles de nuestro encuentro más reciente.</p>
+      <button class="pill-button ghost small" data-scroll="#showrooms">Ver showrooms</button>
     `;
     return;
   }
-  // Heurística: etiqueta que indique "más vendido" o el primero de la lista
-  const best =
-    products.find((p) => /más\s*vendido|best|destacado/i.test(p.tag || '')) || products[0];
-  const imgSrc = best.image || best.imageData || best.imageUrl || '';
-  const priceText = typeof best.price === 'number' ? `$${Number(best.price).toLocaleString('es-CL')}` : (best.price || '');
+  const s = showroomsData[0];
+  const cover = s.cover || (s.photos && s.photos[0]) || '';
   holder.innerHTML = `
-    <h3>Más vendido</h3>
+    <h3>Último showroom</h3>
     <div class="product-media" style="margin:0.5rem 0 0.75rem">
-      ${imgSrc ? `<img src="${imgSrc}" alt="${best.title}" loading="lazy" />` : ''}
+      ${cover ? `<img src="${cover}" alt="${s.title}" loading="lazy" />` : ''}
     </div>
-    <p class="lead" style="margin:0">${best.title}</p>
-    ${priceText ? `<p class="price" style="margin:0">${priceText}</p>` : ''}
-    <button class="pill-button ghost small" data-scroll="#productos">Ver catálogo</button>
+    <p class="lead" style="margin:0">${s.title}</p>
+    <p class="tag" style="margin:0.25rem 0">${s.date || ''} ${s.location ? '• ' + s.location : ''}</p>
+    <button class="pill-button ghost small" data-scroll="#showrooms">Ver showrooms</button>
   `;
 }
 
@@ -395,7 +408,6 @@ async function fetchCatalog() {
     if (Array.isArray(list)) {
       products = list;
       renderProducts(activeFilter);
-      renderBestseller();
       return;
     }
   } catch (e) {
@@ -404,7 +416,6 @@ async function fetchCatalog() {
   // Si no hay datos, deja el grid con un mensaje
   products = [];
   renderProducts(activeFilter);
-  renderBestseller();
 }
 
 fetchCatalog();
@@ -527,10 +538,6 @@ document.addEventListener("keydown", (e) => {
 
 // Se movió el panel admin a admin.html (admin.js)
 // Showrooms: listar y renderizar + lightbox
-const showroomGrid = document.querySelector('#showroomGrid');
-let showroomsData = [];
-let currentShowroom = null;
-let currentSrIndex = 0;
 async function fetchShowrooms() {
   try {
     const res = await fetch(`${API_BASE_URL}/api/showrooms`);
@@ -538,10 +545,12 @@ async function fetchShowrooms() {
     const { showrooms } = await res.json();
     showroomsData = Array.isArray(showrooms) ? showrooms : [];
     renderShowrooms(showroomsData);
+    renderShowroomHero();
   } catch (e) {
     console.warn('Showrooms no disponibles', e);
     showroomsData = [];
     renderShowrooms([]);
+    renderShowroomHero();
   }
 }
 
