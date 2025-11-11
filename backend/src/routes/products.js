@@ -2,10 +2,14 @@ import { Router } from "express";
 import { FieldValue, productsCollection } from "../config/firestore.js";
 import { productSchema } from "../utils/validators.js";
 import { apiKeyGuard } from "../middleware/apiKey.js";
+import { verifyGoogle } from "../middleware/verifyGoogle.js";
 
 const router = Router();
 
 const toProduct = (doc) => ({ id: doc.id, ...doc.data() });
+
+// Protege todo el router con Google Sign-In
+router.use(verifyGoogle);
 
 router.get("/", async (req, res, next) => {
   try {
@@ -25,7 +29,9 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.post("/", apiKeyGuard, async (req, res, next) => {
+const requireApiKey = (process.env.ENFORCE_ADMIN_API_KEY || "false").toLowerCase() === "true";
+
+const createHandler = async (req, res, next) => {
   try {
     const parsed = productSchema.parse({
       ...req.body,
@@ -35,6 +41,7 @@ router.post("/", apiKeyGuard, async (req, res, next) => {
 
     const created = await productsCollection.add({
       ...parsed,
+      owner: req.user?.email || "admin",
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
@@ -44,9 +51,15 @@ router.post("/", apiKeyGuard, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+};
 
-router.patch("/:id/stock", apiKeyGuard, async (req, res, next) => {
+if (requireApiKey) {
+  router.post("/", apiKeyGuard, createHandler);
+} else {
+  router.post("/", createHandler);
+}
+
+const patchHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { stock } = req.body;
@@ -67,6 +80,12 @@ router.patch("/:id/stock", apiKeyGuard, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+};
+
+if (requireApiKey) {
+  router.patch("/:id/stock", apiKeyGuard, patchHandler);
+} else {
+  router.patch("/:id/stock", patchHandler);
+}
 
 export default router;

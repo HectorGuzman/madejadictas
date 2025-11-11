@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>madejadictas® · Panel</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="logo">
+        <img src="assets/logo.JPG" alt="Logo madejadictas" />
+        <div>
+          <strong>madejadictas®</strong>
+          <p>Panel de catálogo</p>
+        </div>
+      </div>
+      <nav class="main-nav">
+        <a href="index.html">Volver al sitio</a>
+      </nav>
+    </header>
+
+    <main style="padding-top:2rem">
+      <section class="account-section">
+        <div class="section-heading">
+          <p class="eyebrow">Acceso del equipo</p>
+          <h2>Administración del catálogo</h2>
+          <p>
+            Inicia sesión con Google usando el correo autorizado del equipo. Tras
+            autenticarte, podrás cargar productos y ver el inventario.
+          </p>
+        </div>
+
+        <div class="admin-auth">
+          <div id="googleButtonContainer"></div>
+          <div id="teamProfile" hidden>
+            <p class="admin-status">
+              Conectada como <strong id="teamName"></strong>
+            </p>
+            <span id="teamEmail"></span>
+            <div class="team-actions">
+              <button class="pill-button secondary small" id="updateApiKeyButton">
+                Actualizar clave API
+              </button>
+              <button class="pill-button ghost small" id="signOutButton">
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form id="productForm" class="admin-form" hidden>
+          <div class="two-col">
+            <label>
+              Nombre del producto
+              <input type="text" name="title" required />
+            </label>
+            <label>
+              SKU / Código
+              <input type="text" name="sku" required />
+            </label>
+          </div>
+          <div class="two-col">
+            <label>
+              Precio (CLP)
+              <input type="number" name="price" inputmode="numeric" required />
+            </label>
+            <label>
+              Stock disponible
+              <input type="number" name="stock" min="0" required />
+            </label>
+          </div>
+          <label>
+            Categoría
+            <select name="category" required>
+              <option value="">Selecciona</option>
+              <option value="lanas">Lanas</option>
+              <option value="kits">Kits</option>
+              <option value="accesorios">Accesorios</option>
+            </select>
+          </label>
+          <label>
+            URL de foto (opcional)
+            <input type="url" name="image" placeholder="https://..." />
+          </label>
+          <label>
+            Notas internas
+            <textarea name="notes" rows="3" placeholder="Tintorera, lote, variaciones..."></textarea>
+          </label>
+          <button type="submit" class="pill-button secondary small">
+            Publicar en catálogo
+          </button>
+        </form>
+
+        <section id="inventoryPanel" class="inventory-panel" hidden>
+          <div class="inventory-head">
+            <h4>Inventario</h4>
+            <button class="pill-button ghost small" id="clearInventory">
+              Limpiar vista local
+            </button>
+          </div>
+          <ul id="inventoryList"></ul>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="admin.js" defer></script>
+  </body>
+  </html>

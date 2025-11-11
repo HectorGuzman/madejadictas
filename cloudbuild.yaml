@@ -27,9 +27,12 @@ steps:
         "us-central1",
         "--allow-unauthenticated",
         "--set-env-vars",
-        "ADMIN_API_KEY=${_ADMIN_API_KEY}",
+        "ADMIN_API_KEY=${_ADMIN_API_KEY},GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},ALLOWED_ADMINS=${_ALLOWED_ADMINS},ENFORCE_ADMIN_API_KEY=${_ENFORCE_ADMIN_API_KEY}",
       ]
 images:
   - gcr.io/$PROJECT_ID/madejadictas-api:latest
 substitutions:
   _ADMIN_API_KEY: lanas-colores-2024
+  _GOOGLE_CLIENT_ID: TU_CLIENT_ID.apps.googleusercontent.com
+  _ALLOWED_ADMINS: claudia@madejadictas.com,carla@madejadictas.com,hector@madejadictas.com
+  _ENFORCE_ADMIN_API_KEY: "false"

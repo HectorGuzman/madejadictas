@@ -83,9 +83,7 @@
             <button class="pill-button secondary" data-scroll="#kits">
               Armar mi kit
             </button>
-            <button class="pill-button admin-launcher" id="openAdminPanel">
-              Panel Claudia & Carla
-            </button>
+            
           </div>
           <div class="hero-badges">
             <div>
@@ -268,98 +266,7 @@
       </div>
     </dialog>
 
-    <dialog id="adminDialog" aria-label="Panel administrativo de madejadictas®">
-      <div class="dialog-content admin">
-        <div class="dialog-head">
-          <h3>Panel de catálogo</h3>
-          <button class="close-button" id="closeAdminDialog" aria-label="Cerrar panel">
-            ×
-          </button>
-        </div>
-        <div class="admin-auth">
-          <div id="teamProfile" hidden>
-            <p class="admin-status">
-              Conectada como <strong id="teamName"></strong>
-            </p>
-            <span id="teamEmail"></span>
-            <div class="team-actions">
-              <button class="pill-button secondary small" id="updateApiKeyButton">
-                Actualizar clave API
-              </button>
-              <button class="pill-button ghost small" id="signOutButton">
-                Cerrar sesión
-              </button>
-            </div>
-          </div>
-          <div id="googleButtonContainer"></div>
-          <p class="helper-text">
-            Acceso exclusivo para Claudia Sepúlveda, Carla Sadoval y Héctor usando su cuenta Google registrada.
-          </p>
-        </div>
-
-        <form id="productForm" class="admin-form" hidden>
-          <div class="two-col">
-            <label>
-              Nombre del producto
-              <input type="text" name="title" required />
-            </label>
-            <label>
-              SKU / Código
-              <input type="text" name="sku" required />
-            </label>
-          </div>
-          <div class="two-col">
-            <label>
-              Precio (CLP)
-              <input type="number" name="price" inputmode="numeric" required />
-            </label>
-            <label>
-              Stock disponible
-              <input type="number" name="stock" min="0" required />
-            </label>
-          </div>
-          <label>
-            Categoría
-            <select name="category" required>
-              <option value="">Selecciona</option>
-              <option value="lanas">Lanas</option>
-              <option value="kits">Kits</option>
-              <option value="accesorios">Accesorios</option>
-            </select>
-          </label>
-          <label>
-            URL de foto (opcional)
-            <input type="url" name="image" placeholder="https://..." />
-          </label>
-          <label>
-            Notas internas
-            <textarea name="notes" rows="3" placeholder="Tintorera, lote, variaciones..."></textarea>
-          </label>
-          <button type="submit" class="pill-button secondary small">
-            Publicar en catálogo
-          </button>
-        </form>
-
-        <section id="inventoryPanel" class="inventory-panel" hidden>
-          <div class="inventory-head">
-            <h4>Inventario temporal</h4>
-            <button class="pill-button ghost small" id="clearInventory">
-              Limpiar lista
-            </button>
-          </div>
-          <p class="helper-text">
-            Vemos aquí los productos registrados por el equipo en tiempo real.
-          </p>
-          <ul id="inventoryList"></ul>
-        </section>
-      </div>
-    </dialog>
-
-    <script
-      src="https://accounts.google.com/gsi/client"
-      async
-      defer
-    ></script>
+    
     <script src="script.js" defer></script>
   </body>
 </html>

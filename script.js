@@ -150,315 +150,33 @@ buildStamp.textContent = formatter.format(new Date());
 
 renderProducts();
 
-// Admin modal logic with Google sign-in
-const GOOGLE_CLIENT_ID = "TU_CLIENT_ID.apps.googleusercontent.com"; // Reemplaza con tu client_id real
-const AUTHORIZED_EMAILS = [
-  "claudia@madejadictas.com",
-  "carla@madejadictas.com",
-  "hector@madejadictas.com",
-].map((email) => email.toLowerCase());
-const ADMIN_HEADER = "x-admin-key";
-const ADMIN_KEY_STORAGE = "mdAdminKey";
-const INVENTORY_KEY = "mdInventory";
-
-const adminDialog = document.querySelector("#adminDialog");
-const openAdminPanel = document.querySelector("#openAdminPanel");
-const closeAdminDialog = document.querySelector("#closeAdminDialog");
-const productForm = document.querySelector("#productForm");
-const inventoryPanel = document.querySelector("#inventoryPanel");
-const inventoryList = document.querySelector("#inventoryList");
-const clearInventoryButton = document.querySelector("#clearInventory");
-const googleButtonContainer = document.querySelector("#googleButtonContainer");
-const teamProfile = document.querySelector("#teamProfile");
-const teamName = document.querySelector("#teamName");
-const teamEmail = document.querySelector("#teamEmail");
-const signOutButton = document.querySelector("#signOutButton");
-const updateApiKeyButton = document.querySelector("#updateApiKeyButton");
-
-let inventory = [];
-let adminKey = localStorage.getItem(ADMIN_KEY_STORAGE) || "";
-let currentUser = null;
-let idToken = null;
-let googleReady = false;
-
-const parseJwt = (token) => {
-  const base64Url = token.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const jsonPayload = decodeURIComponent(
-    window
-      .atob(base64)
-      .split("")
-      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-      .join("")
-  );
-  return JSON.parse(jsonPayload);
-};
-
-const loadInventoryFromCache = () => {
-  try {
-    const stored = localStorage.getItem(INVENTORY_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    console.warn("No se pudo leer inventario local", error);
-    return [];
+// Acceso oculto al panel admin:
+// Atajo de teclado: Ctrl/Cmd + Alt + A
+document.addEventListener("keydown", (e) => {
+  const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+  if (isCtrlOrCmd && e.altKey && e.key.toLowerCase() === "a") {
+    window.location.href = "admin.html";
   }
-};
+});
 
-const renderInventoryMessage = (text) => {
-  inventoryList.innerHTML = "";
-  const li = document.createElement("li");
-  li.style.color = "var(--muted)";
-  li.style.fontSize = "0.9rem";
-  li.textContent = text;
-  inventoryList.appendChild(li);
-};
-
-const renderInventory = () => {
-  inventoryList.innerHTML = "";
-  if (!inventory.length) {
-    renderInventoryMessage(
-      currentUser && idToken ? "Sin productos registrados todavía." : "Ingresa con Google para ver el inventario."
-    );
-    return;
-  }
-
-  inventory.forEach((item) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${item.title}</strong>
-      <span>SKU: ${item.sku} · ${item.category}</span>
-      <span>Precio: $${Number(item.price).toLocaleString("es-CL")} · Stock: ${item.stock}</span>
-      ${item.notes ? `<span>Notas: ${item.notes}</span>` : ""}
-      <span>Registrado por ${item.owner || "Equipo"} el ${item.createdAt}</span>
-    `;
-    inventoryList.appendChild(li);
-  });
-};
-
-inventory = loadInventoryFromCache();
-renderInventory();
-
-const updateAdminUI = () => {
-  const isAuth = Boolean(currentUser && idToken);
-  productForm.hidden = !isAuth;
-  inventoryPanel.hidden = !isAuth;
-  clearInventoryButton.disabled = !isAuth;
-  if (teamProfile) teamProfile.hidden = !isAuth;
-  if (googleButtonContainer) {
-    googleButtonContainer.style.display = isAuth ? "none" : "flex";
-  }
-  if (updateApiKeyButton) updateApiKeyButton.hidden = !isAuth;
-
-  if (isAuth) {
-    teamName.textContent = currentUser.name || currentUser.email;
-    teamEmail.textContent = currentUser.email;
-    if (!inventory.length) renderInventoryMessage("Sin productos registrados todavía.");
-    else renderInventory();
-  } else {
-    teamEmail.textContent = "";
-    renderInventoryMessage("Ingresa con Google para ver el inventario.");
-  }
-};
-
-updateAdminUI();
-
-const handleCredentialResponse = (response) => {
-  try {
-    const payload = parseJwt(response.credential);
-    const email = payload.email?.toLowerCase();
-    if (!email || !AUTHORIZED_EMAILS.includes(email)) {
-      alert("Tu cuenta no tiene permisos para administrar el catálogo.");
+// Easter egg: 5 clics rápidos en el logo abre admin
+(() => {
+  const logo = document.querySelector(".logo");
+  if (!logo) return;
+  let clicks = 0;
+  let timer = null;
+  logo.addEventListener("click", () => {
+    clicks += 1;
+    clearTimeout(timer);
+    if (clicks >= 5) {
+      window.location.href = "admin.html";
+      clicks = 0;
       return;
     }
-    currentUser = {
-      name: payload.name || email,
-      email,
-      picture: payload.picture,
-    };
-    idToken = response.credential;
-    updateAdminUI();
-    fetchInventoryFromBackend();
-    if (!adminKey) {
-      configureApiKey();
-    }
-  } catch (error) {
-    console.error(error);
-    alert("No se pudo validar tu sesión de Google.");
-  }
-};
-
-const initGoogleAuth = () => {
-  if (googleReady) return;
-  if (!window.google?.accounts?.id) return;
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleCredentialResponse,
-    auto_select: true,
-    use_fedcm_for_prompt: true,
+    timer = setTimeout(() => {
+      clicks = 0;
+    }, 1200);
   });
-  if (googleButtonContainer) {
-    google.accounts.id.renderButton(googleButtonContainer, {
-      theme: "outline",
-      size: "large",
-      type: "standard",
-      shape: "pill",
-    });
-  }
-  googleReady = true;
-};
+})();
 
-window.addEventListener("load", initGoogleAuth);
-
-const configureApiKey = () => {
-  const value = prompt("Ingresa la clave API que comparte Héctor:", adminKey);
-  if (!value) return;
-  adminKey = value.trim();
-  localStorage.setItem(ADMIN_KEY_STORAGE, adminKey);
-};
-
-const fetchInventoryFromBackend = async () => {
-  if (!currentUser || !idToken) return;
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/products`, {
-      headers: {
-        Authorization: `Bearer ${idToken}`,
-        ...(adminKey ? { [ADMIN_HEADER]: adminKey } : {}),
-      },
-    });
-    if (!response.ok) {
-      if (response.status === 401) {
-        renderInventoryMessage("Tu sesión expiró, vuelve a conectarte.");
-      }
-      return;
-    }
-    const { products } = await response.json();
-    if (Array.isArray(products)) {
-      inventory = products.map((product) => ({
-        ...product,
-        owner: product.owner || currentUser.name,
-        createdAt:
-          product.createdAt?.seconds
-            ? new Date(product.createdAt.seconds * 1000).toLocaleString("es-CL")
-            : new Date().toLocaleString("es-CL"),
-      }));
-      localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-      renderInventory();
-    }
-  } catch (error) {
-    console.warn("No se pudo sincronizar inventario remoto", error);
-  }
-};
-
-const saveProductRemote = async (payload) => {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${idToken}`,
-  };
-  if (adminKey) headers[ADMIN_HEADER] = adminKey;
-
-  const response = await fetch(`${API_BASE_URL}/api/products`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    let detail = "Error al guardar producto";
-    try {
-      const data = await response.json();
-      detail = data.error || JSON.stringify(data);
-    } catch (_) {
-      // ignored
-    }
-    throw new Error(detail);
-  }
-
-  return response.json();
-};
-
-productForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (!currentUser || !idToken) {
-    alert("Inicia sesión con Google para publicar productos.");
-    return;
-  }
-  if (!adminKey) {
-    configureApiKey();
-    if (!adminKey) return;
-  }
-
-  const formData = new FormData(event.target);
-  const entry = Object.fromEntries(formData.entries());
-  const payload = {
-    title: entry.title?.trim(),
-    sku: entry.sku?.trim(),
-    price: Number(entry.price),
-    stock: Number(entry.stock),
-    category: entry.category,
-    image: entry.image?.trim(),
-    notes: entry.notes?.trim(),
-  };
-
-  if (!payload.title || !payload.sku || Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
-    alert("Completa nombre, SKU, precio y stock antes de guardar.");
-    return;
-  }
-
-  if (!payload.image) delete payload.image;
-  if (!payload.notes) delete payload.notes;
-
-  try {
-    const { product } = await saveProductRemote(payload);
-    const storedItem = {
-      ...product,
-      owner: currentUser.name || currentUser.email,
-      createdAt: new Intl.DateTimeFormat("es-CL", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      }).format(new Date()),
-    };
-    inventory = [storedItem, ...inventory];
-    localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-    renderInventory();
-    event.target.reset();
-    alert("Producto enviado al backend de madejadictas®.");
-  } catch (error) {
-    console.error(error);
-    alert(error.message || "No pudimos guardar el producto, intenta nuevamente.");
-  }
-});
-
-clearInventoryButton.addEventListener("click", () => {
-  if (!inventory.length) return;
-  const confirmed = confirm("¿Seguro que quieres limpiar la vista local?");
-  if (!confirmed) return;
-  inventory = [];
-  localStorage.removeItem(INVENTORY_KEY);
-  renderInventoryMessage("Sin productos registrados todavía.");
-});
-
-const signOut = () => {
-  if (window.google?.accounts?.id && currentUser?.email) {
-    google.accounts.id.revoke(currentUser.email, () => {});
-    google.accounts.id.disableAutoSelect();
-  }
-  currentUser = null;
-  idToken = null;
-  updateAdminUI();
-};
-
-signOutButton.addEventListener("click", signOut);
-if (updateApiKeyButton) updateApiKeyButton.addEventListener("click", configureApiKey);
-
-openAdminPanel.addEventListener("click", () => {
-  initGoogleAuth();
-  adminDialog.showModal();
-  updateAdminUI();
-  if (currentUser && idToken) {
-    fetchInventoryFromBackend();
-  } else if (window.google?.accounts?.id) {
-    google.accounts.id.prompt();
-  }
-});
-
-closeAdminDialog.addEventListener("click", () => adminDialog.close());
+// Se movió el panel admin a admin.html (admin.js)
