@@ -406,6 +406,66 @@ setInterval(() => {
   }
 }, 300000);
 
+// Lightbox de showrooms
+const srDialog = document.getElementById('showroomDialog');
+const srTitle = document.getElementById('srTitle');
+const srMeta = document.getElementById('srMeta');
+const srMainImg = document.getElementById('srMainImg');
+const srThumbs = document.getElementById('srThumbs');
+const srClose = document.getElementById('srClose');
+const srPrev = document.getElementById('srPrev');
+const srNext = document.getElementById('srNext');
+
+function openShowroomById(id) {
+  const s = showroomsData.find((x) => x.id === id);
+  if (!s) return;
+  currentShowroom = s;
+  currentSrIndex = 0;
+  renderShowroomDialog();
+  srDialog?.showModal();
+}
+
+function renderShowroomDialog() {
+  if (!currentShowroom) return;
+  srTitle.textContent = currentShowroom.title || 'Showroom';
+  srMeta.textContent = `${currentShowroom.date || ''} • ${currentShowroom.location || ''}`.trim();
+  const photos = currentShowroom.photos || [];
+  if (!photos.length) {
+    srMainImg.removeAttribute('src');
+  } else {
+    currentSrIndex = Math.max(0, Math.min(currentSrIndex, photos.length - 1));
+    srMainImg.src = photos[currentSrIndex];
+  }
+  srThumbs.innerHTML = '';
+  photos.forEach((p, i) => {
+    const img = document.createElement('img');
+    img.src = p;
+    img.alt = `${currentShowroom.title} ${i + 1}`;
+    if (i === currentSrIndex) img.classList.add('active');
+    img.addEventListener('click', () => { currentSrIndex = i; renderShowroomDialog(); });
+    srThumbs.appendChild(img);
+  });
+}
+
+srClose?.addEventListener('click', () => srDialog?.close());
+srPrev?.addEventListener('click', () => {
+  if (!currentShowroom) return;
+  const n = (currentSrIndex - 1 + currentShowroom.photos.length) % currentShowroom.photos.length;
+  currentSrIndex = n; renderShowroomDialog();
+});
+srNext?.addEventListener('click', () => {
+  if (!currentShowroom) return;
+  const n = (currentSrIndex + 1) % currentShowroom.photos.length;
+  currentSrIndex = n; renderShowroomDialog();
+});
+
+showroomGrid?.addEventListener('click', (e) => {
+  const card = e.target.closest('.showroom-card');
+  if (!card) return;
+  const id = card.getAttribute('data-srid');
+  if (id) openShowroomById(id);
+});
+
 // Acceso oculto al panel admin:
 // Atajo de teclado: Ctrl/Cmd + Alt + A
 document.addEventListener("keydown", (e) => {
@@ -436,16 +496,21 @@ document.addEventListener("keydown", (e) => {
 })();
 
 // Se movió el panel admin a admin.html (admin.js)
-// Showrooms: listar y renderizar
+// Showrooms: listar y renderizar + lightbox
 const showroomGrid = document.querySelector('#showroomGrid');
+let showroomsData = [];
+let currentShowroom = null;
+let currentSrIndex = 0;
 async function fetchShowrooms() {
   try {
     const res = await fetch(`${API_BASE_URL}/api/showrooms`);
     if (!res.ok) throw new Error('No se pudo cargar showrooms');
     const { showrooms } = await res.json();
-    renderShowrooms(showrooms || []);
+    showroomsData = Array.isArray(showrooms) ? showrooms : [];
+    renderShowrooms(showroomsData);
   } catch (e) {
     console.warn('Showrooms no disponibles', e);
+    showroomsData = [];
     renderShowrooms([]);
   }
 }
@@ -463,6 +528,7 @@ function renderShowrooms(list) {
   list.forEach((s) => {
     const card = document.createElement('article');
     card.className = 'product-card showroom-card';
+    card.dataset.srid = s.id;
     const cover = s.cover || (s.photos && s.photos[0]) || '';
     card.innerHTML = `
       <div class="cover">${cover ? `<img src="${cover}" alt="${s.title}" />` : ''}</div>

@@ -342,6 +342,62 @@ h3 {
   display: block;
 }
 
+/* Lightbox de showrooms */
+#showroomDialog .sr-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  overflow: hidden;
+  max-height: 70vh;
+}
+
+#srMainImg {
+  max-width: 100%;
+  max-height: 70vh;
+  display: block;
+}
+
+#showroomDialog .nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+#showroomDialog .nav.prev { left: 0.5rem; }
+#showroomDialog .nav.next { right: 0.5rem; }
+
+.sr-thumbs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.sr-thumbs img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.sr-thumbs img.active { border-color: var(--accent); }
+
 .product-card {
   background: #fff8f6;
   border-radius: 1.25rem;
