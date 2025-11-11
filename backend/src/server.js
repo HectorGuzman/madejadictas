@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import productsRouter from "./routes/products.js";
+import ordersRouter from "./routes/orders.js";
+import showroomsRouter from "./routes/showrooms.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -16,6 +18,8 @@ app.get("/healthz", (req, res) =>
 );
 
 app.use("/api/products", productsRouter);
+app.use("/api/orders", ordersRouter);
+app.use("/api/showrooms", showroomsRouter);
 
 app.use((err, req, res, next) => {
   if (err.name === "ZodError") {

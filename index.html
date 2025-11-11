@@ -27,7 +27,7 @@
       </div>
       <nav class="main-nav">
         <a href="#productos">Productos</a>
-        <a href="#kits">Kits</a>
+        <a href="#showrooms">Showrooms</a>
         <a href="#creadoras">Creadoras</a>
         <a href="#login">Mi cuenta</a>
       </nav>
@@ -53,7 +53,7 @@
           <img src="assets/whatsapp_rose_gold.svg" alt="WhatsApp" class="icon-img" />
         </a>
       </div>
-      <button class="pill-button ghost" data-scroll="#kits">
+      <button class="pill-button ghost" data-scroll="#productos">
         Ver catálogo
       </button>
       <button class="menu-toggle" aria-label="Abrir menú">
@@ -80,8 +80,8 @@
             <button class="pill-button primary" data-scroll="#productos">
               Explorar novedades
             </button>
-            <button class="pill-button secondary" data-scroll="#kits">
-              Armar mi kit
+            <button class="pill-button secondary" data-scroll="#productos">
+              Ver todos los productos
             </button>
             
           </div>
@@ -96,15 +96,10 @@
             </div>
           </div>
         </div>
-        <div class="hero-card">
-          <h3>Clase en vivo: Punto brioche</h3>
-          <p>Incluye kit con materiales + acceso al streaming.</p>
-          <ul>
-            <li>Domingo 21 · 10:30 hrs</li>
-            <li>Profesora: Vale Torres</li>
-            <li>Cupo: 25 tejedoras</li>
-          </ul>
-          <button class="pill-button ghost small">Reservar cupo</button>
+        <div class="hero-card" id="bestsellerCard">
+          <h3>Más vendido</h3>
+          <p>Muy pronto destacaremos nuestro favorito de la semana.</p>
+          <button class="pill-button ghost small" data-scroll="#productos">Ver catálogo</button>
         </div>
       </section>
 
@@ -126,44 +121,17 @@
         <div class="product-grid" id="productGrid"></div>
       </section>
 
-      <section class="kits-section" id="kits">
-        <div class="kits-copy">
-          <p class="eyebrow">Personaliza tu experiencia</p>
-          <h2>Kits diseñados para tu ritmo</h2>
-          <p>
-            Selecciona nivel, técnica y tiempo disponible. Te proponemos
-            combinaciones de colores y enviamos todo listo para tejer.
+      <section class="product-showcase" id="showrooms">
+        <div class="section-heading">
+          <p class="eyebrow">Eventos y comunidad</p>
+          <h2>Showrooms</h2>
+          <p>Recopilamos fotos de nuestros encuentros y showrooms.
           </p>
-          <ul class="kit-benefits">
-            <li>Video paso a paso + guía descargable</li>
-            <li>Soporte por WhatsApp para dudas técnicas</li>
-            <li>Recomendaciones de complementos y cuidado</li>
-          </ul>
-          <button class="pill-button primary">Simular kit</button>
         </div>
-        <div class="kits-card" aria-label="Detalle del kit destacado">
-          <div class="kit-palette">
-            <span class="swatch terracotta"></span>
-            <span class="swatch honey"></span>
-            <span class="swatch sage"></span>
-            <span class="swatch cloud"></span>
-          </div>
-          <div class="kit-details">
-            <p class="eyebrow">Kit destacado</p>
-            <h3>Suéter Andes</h3>
-            <p class="lead">Tiempo estimado: 12h · Nivel intermedio</p>
-            <div class="kit-includes">
-              <p>Incluye:</p>
-              <ul>
-                <li>500g Merino DK + degradé</li>
-                <li>Palillos circulares 4.5mm</li>
-                <li>Marcadores + bolsa de lino</li>
-              </ul>
-            </div>
-            <button class="pill-button secondary small">Ver instrucciones</button>
-          </div>
-        </div>
+        <div class="product-grid" id="showroomGrid"></div>
       </section>
+
+      
 
       <section class="creators" id="creadoras">
         <div class="section-heading">
@@ -221,6 +189,7 @@
           </p>
         </div>
         <div class="account-actions">
+          <div id="googleButtonContainerLanding"></div>
           <button class="pill-button primary large" id="googleLoginButton">
             <span class="material-icon">G</span>Continuar con Google
           </button>
@@ -228,6 +197,70 @@
             Comprar como invitada
           </button>
         </div>
+        <div id="accountProfile" class="inventory-panel" hidden>
+          <p class="admin-status" style="margin:0">
+            Conectada como <strong id="accountName"></strong>
+          </p>
+          <span id="accountEmail" style="font-size:0.9rem;color:var(--muted)"></span>
+          <div class="team-actions" style="margin-top:0.5rem">
+            <button class="pill-button ghost small" id="signOutLanding">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <form id="accountForm" class="admin-form" aria-label="Datos para despacho">
+          <div class="two-col">
+            <label>
+              Nombre completo
+              <input type="text" name="fullName" autocomplete="name" required />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+          </div>
+          <div class="two-col">
+            <label>
+              Teléfono
+              <input type="tel" name="phone" autocomplete="tel" />
+            </label>
+            <label>
+              Región
+              <input type="text" name="region" placeholder="Ej: Coquimbo" />
+            </label>
+          </div>
+          <div class="two-col">
+            <label>
+              Dirección
+              <input type="text" name="address" autocomplete="street-address" required />
+            </label>
+            <label>
+              Comuna
+              <input type="text" name="city" placeholder="Ej: La Serena" />
+            </label>
+          </div>
+          <label>
+            Notas para el despacho
+            <textarea name="notes" rows="3" placeholder="Depto, referencias, horario, etc."></textarea>
+          </label>
+          <div class="team-actions">
+            <button type="submit" class="pill-button secondary small">Guardar datos</button>
+            <button type="button" class="pill-button ghost small" id="useGoogleDataButton">Usar datos de Google</button>
+            <button type="button" class="pill-button ghost small" id="clearAccountButton">Borrar datos</button>
+          </div>
+          <p id="accountSavedMsg" class="helper-text" aria-live="polite"></p>
+        </form>
+
+        <section id="cartPanel" class="inventory-panel">
+          <div class="inventory-head">
+            <h4>Mi bolsa</h4>
+            <button class="pill-button ghost small" id="clearCartButton">Vaciar</button>
+          </div>
+          <ul id="cartList"></ul>
+          <div class="team-actions">
+            <button class="pill-button primary" id="checkoutButton">Confirmar pedido</button>
+            <span id="checkoutMsg" class="helper-text" aria-live="polite"></span>
+          </div>
+        </section>
       </section>
     </main>
 
@@ -267,6 +300,7 @@
     </dialog>
 
     
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="script.js" defer></script>
   </body>
 </html>

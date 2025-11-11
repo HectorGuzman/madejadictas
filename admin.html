@@ -116,6 +116,40 @@
       </section>
     </main>
 
+    <section class="account-section" style="margin:1rem">
+      <div class="section-heading">
+        <p class="eyebrow">Eventos</p>
+        <h2>Subir showroom</h2>
+        <p>Solo equipo: crea un showroom con título, fecha, ubicación y fotos (máx 10).</p>
+      </div>
+      <form id="showroomForm" class="admin-form" hidden>
+        <div class="two-col">
+          <label>
+            Título del showroom
+            <input type="text" name="title" required />
+          </label>
+          <label>
+            Fecha
+            <input type="date" name="date" required />
+          </label>
+        </div>
+        <label>
+          Ubicación
+          <input type="text" name="location" placeholder="La Serena, Coquimbo" required />
+        </label>
+        <label>
+          Descripción (opcional)
+          <textarea name="description" rows="3" placeholder="Notas del evento"></textarea>
+        </label>
+        <label>
+          Fotos (máx 10)
+          <input id="showroomPhotos" type="file" accept="image/*" multiple capture="environment" required />
+        </label>
+        <div id="showroomPreview" class="inventory-panel" hidden></div>
+        <button type="submit" class="pill-button secondary small">Publicar showroom</button>
+      </form>
+    </section>
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="admin.js" defer></script>
   </body>

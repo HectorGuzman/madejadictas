@@ -98,6 +98,8 @@ const updateAdminUI = () => {
   clearInventoryButton.disabled = !isAuth;
   teamProfile.hidden = !isAuth;
   googleButtonContainer.style.display = isAuth ? "none" : "flex";
+  const showroomForm = document.getElementById('showroomForm');
+  if (showroomForm) showroomForm.hidden = !isAuth;
 };
 
 const configureApiKey = () => {
@@ -391,4 +393,70 @@ function dataURLSizeKB(dataUrl) {
   if (i < 0) return 0;
   const b64 = dataUrl.slice(i + head.length);
   return (b64.length * 3) / 4 / 1024;
+}
+
+// Showrooms: compresión múltiple + publicación
+const showroomPhotos = document.getElementById('showroomPhotos');
+const showroomPreview = document.getElementById('showroomPreview');
+const showroomForm = document.getElementById('showroomForm');
+
+if (showroomPhotos) {
+  showroomPhotos.addEventListener('change', async () => {
+    const files = Array.from(showroomPhotos.files || []).slice(0, 10);
+    showroomPreview.innerHTML = '';
+    if (!files.length) { showroomPreview.hidden = true; return; }
+    for (const f of files) {
+      try {
+        const dataUrl = await compressImageToDataURL(f, 1000, 1000, 0.7);
+        const sizeKB = dataURLSizeKB(dataUrl);
+        const block = document.createElement('div');
+        block.style.display = 'flex';
+        block.style.alignItems = 'center';
+        block.style.gap = '0.5rem';
+        block.innerHTML = `
+          <img src="${dataUrl}" alt="preview" class="inventory-thumb" />
+          <span class="helper-text">${f.name} • ~${sizeKB.toFixed(0)} KB</span>
+        `;
+        showroomPreview.appendChild(block);
+      } catch {}
+    }
+    showroomPreview.hidden = false;
+  });
+}
+
+if (showroomForm) {
+  showroomForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentUser || !idToken) { alert('Inicia sesión con Google'); return; }
+    const files = Array.from(showroomPhotos.files || []).slice(0, 10);
+    if (!files.length) { alert('Agrega al menos una foto'); return; }
+    const body = Object.fromEntries(new FormData(showroomForm).entries());
+    try {
+      const photos = [];
+      for (const f of files) {
+        const dataUrl = await compressImageToDataURL(f, 1000, 1000, 0.7);
+        photos.push(dataUrl);
+      }
+      const payload = {
+        title: body.title?.trim(),
+        date: body.date,
+        location: body.location?.trim(),
+        description: body.description?.trim(),
+        photos,
+      };
+      const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` };
+      if (adminKey) headers[ADMIN_HEADER] = adminKey;
+      const res = await fetch(`${API_BASE_URL}/api/showrooms`, {
+        method: 'POST', headers, body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('No se pudo publicar el showroom');
+      showroomForm.reset();
+      showroomPreview.innerHTML = '';
+      showroomPreview.hidden = true;
+      alert('Showroom publicado');
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Error publicando showroom');
+    }
+  });
 }

@@ -9,3 +9,5 @@ if (!admin.apps.length) {
 export const db = admin.firestore();
 export const FieldValue = admin.firestore.FieldValue;
 export const productsCollection = db.collection("products");
+export const ordersCollection = db.collection("orders");
+export const showroomsCollection = db.collection("showrooms");

@@ -327,6 +327,21 @@ h3 {
   gap: 1.25rem;
 }
 
+/* Cards de showrooms reutilizan estilos de product-card */
+.showroom-card .cover {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.showroom-card .cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .product-card {
   background: #fff8f6;
   border-radius: 1.25rem;
@@ -729,6 +744,11 @@ dialog::backdrop {
 
 .inventory-panel .inv-meta strong {
   display: block;
+}
+
+/* Cart simple */
+#cartPanel {
+  margin-top: 1rem;
 }
 
 @media (max-width: 900px) {
