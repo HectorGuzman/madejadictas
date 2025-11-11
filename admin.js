@@ -55,10 +55,35 @@ const renderInventory = () => {
   }
   inventory.forEach((item) => {
     const li = document.createElement("li");
+    li.dataset.id = item.id;
+    const imgSrc = item.image || item.imageData || "";
     li.innerHTML = `
-      <strong>${item.title}</strong>
-      <span>SKU: ${item.sku} · ${item.category}</span>
-      <span>Precio: $${Number(item.price).toLocaleString("es-CL")} · Stock: ${item.stock}</span>
+      <div class="inv-head">
+        ${imgSrc
+          ? `<img class="inventory-thumb" src="${imgSrc}" alt="Foto ${item.title}" />`
+          : `<div class="inventory-thumb placeholder" aria-hidden="true"></div>`}
+        <div class="inv-meta">
+          <strong>${item.title}</strong>
+          <span>SKU: ${item.sku} · ${item.category}</span>
+        </div>
+      </div>
+      <div class="two-col">
+        <label>
+          Precio (CLP)
+          <input type="number" class="inv-price" min="0" step="1" value="${Number(
+            item.price
+          )}" />
+        </label>
+        <label>
+          Stock
+          <input type="number" class="inv-stock" min="0" step="1" value="${Number(
+            item.stock
+          )}" />
+        </label>
+      </div>
+      <div>
+        <button class="pill-button secondary small save-item">Guardar cambios</button>
+      </div>
       ${item.notes ? `<span>Notas: ${item.notes}</span>` : ""}
       <span>Registrado por ${item.owner || "Equipo"} el ${item.createdAt}</span>
     `;
@@ -150,15 +175,28 @@ productForm.addEventListener("submit", async (e) => {
     price: Number(entry.price),
     stock: Number(entry.stock),
     category: entry.category,
-    image: entry.image?.trim(),
     notes: entry.notes?.trim(),
   };
   if (!payload.title || !payload.sku || Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
     alert("Completa nombre, SKU, precio y stock antes de guardar.");
     return;
   }
-  if (!payload.image) delete payload.image;
   if (!payload.notes) delete payload.notes;
+
+  // Foto requerida: tomamos el archivo, comprimimos y adjuntamos como dataURL
+  const file = document.querySelector('#photoInput').files[0];
+  if (!file) {
+    alert('La foto del producto es requerida.');
+    return;
+  }
+  try {
+    const dataUrl = await compressImageToDataURL(file, 1280, 1280, 0.72);
+    payload.imageData = dataUrl; // backend acepta dataURL
+  } catch (err) {
+    console.error(err);
+    alert('No pudimos procesar la foto. Intenta con otra imagen.');
+    return;
+  }
 
   try {
     const { product } = await saveProductRemote(payload);
@@ -174,6 +212,9 @@ productForm.addEventListener("submit", async (e) => {
     localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
     renderInventory();
     e.target.reset();
+    // Limpia vista previa
+    const preview = document.getElementById('photoPreview');
+    if (preview) preview.hidden = true;
     alert("Producto enviado al backend de madejadictas®.");
   } catch (err) {
     console.error(err);
@@ -188,6 +229,45 @@ clearInventoryButton.addEventListener("click", () => {
   inventory = [];
   localStorage.removeItem(INVENTORY_KEY);
   renderInventoryMessage("Sin productos registrados todavía.");
+});
+
+// Actualización inline de precio/stock
+inventoryList.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".save-item");
+  if (!btn) return;
+  const li = btn.closest("li");
+  const id = li?.dataset?.id;
+  if (!id) return;
+  const priceEl = li.querySelector(".inv-price");
+  const stockEl = li.querySelector(".inv-stock");
+  const price = Number(priceEl?.value);
+  const stock = Number(stockEl?.value);
+  if (Number.isNaN(price) || price < 0 || Number.isNaN(stock) || stock < 0) {
+    alert("Revisa los valores de precio y stock.");
+    return;
+  }
+  try {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    };
+    if (adminKey) headers[ADMIN_HEADER] = adminKey;
+    const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({ price, stock }),
+    });
+    if (!res.ok) throw new Error("No se pudo actualizar el producto");
+    const { product } = await res.json();
+    const idx = inventory.findIndex((p) => p.id === id);
+    if (idx >= 0) {
+      inventory[idx] = { ...inventory[idx], price: product.price, stock: product.stock };
+    }
+    renderInventory();
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Error actualizando");
+  }
 });
 
 const signOut = () => {
@@ -251,3 +331,64 @@ window.addEventListener("load", () => {
   initGoogleAuth();
 });
 
+// Utilidades de imagen: compresión a dataURL
+function readFileAsImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function compressImageToDataURL(file, maxW = 1280, maxH = 1280, quality = 0.72) {
+  const img = await readFileAsImage(file);
+  let { width, height } = img;
+  const ratio = Math.min(maxW / width, maxH / height, 1);
+  const targetW = Math.round(width * ratio);
+  const targetH = Math.round(height * ratio);
+  const canvas = document.createElement('canvas');
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, targetW, targetH);
+  // Forzar JPEG para mayor compresión
+  return canvas.toDataURL('image/jpeg', quality);
+}
+
+// Vista previa de imagen
+const photoInput = document.getElementById('photoInput');
+if (photoInput) {
+  photoInput.addEventListener('change', async () => {
+    const file = photoInput.files[0];
+    const preview = document.getElementById('photoPreview');
+    const imgEl = document.getElementById('photoPreviewImg');
+    const meta = document.getElementById('photoMeta');
+    if (!file) {
+      if (preview) preview.hidden = true;
+      return;
+    }
+    try {
+      const dataUrl = await compressImageToDataURL(file, 800, 800, 0.7);
+      if (imgEl) imgEl.src = dataUrl;
+      if (meta) meta.textContent = `Archivo: ${file.name} • Original ${(file.size/1024).toFixed(0)} KB • Envío ~${(dataURLSizeKB(dataUrl)).toFixed(0)} KB`;
+      if (preview) preview.hidden = false;
+    } catch (e) {
+      console.warn('No se pudo generar vista previa', e);
+    }
+  });
+}
+
+function dataURLSizeKB(dataUrl) {
+  // Tamaño aproximado en KB del base64
+  const head = 'base64,';
+  const i = dataUrl.indexOf(head);
+  if (i < 0) return 0;
+  const b64 = dataUrl.slice(i + head.length);
+  return (b64.length * 3) / 4 / 1024;
+}

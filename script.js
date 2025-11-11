@@ -1,93 +1,47 @@
 
 const API_BASE_URL = "https://madejadictas-api-mqjpwzxwma-uc.a.run.app";
 
-const products = [
-  {
-    title: "Merino DK Andes",
-    price: "$16.990",
-    tag: "Lote microtintura",
-    description: "400g · Degradé cobre/terracota · Tratamiento antipeeling",
-    category: "lanas",
-    image:
-      "https://source.unsplash.com/600x450/?yarn,wool,terracotta",
-    imageAlt: "Madejas de lana merino en tonos tierra",
-  },
-  {
-    title: "Kit Chal Aurora",
-    price: "$49.900",
-    tag: "Incluye guía",
-    description: "Nivel intermedio · Agujas 4mm · Acceso a video privado",
-    category: "kits",
-    image:
-      "https://source.unsplash.com/600x450/?yarn,shawl,knitting",
-    imageAlt: "Kit de chal con madejas y palillos",
-  },
-  {
-    title: "Set marcadores 3D",
-    price: "$8.500",
-    tag: "Studio partner",
-    description: "12 piezas · PLA reciclado · Formas geométricas",
-    category: "accesorios",
-    image:
-      "https://source.unsplash.com/600x450/?yarn,notions,knitting",
-    imageAlt: "Madejas y accesorios para tejido",
-  },
-  {
-    title: "Algodón Pima Bloom",
-    price: "$14.500",
-    tag: "Color exclusivo",
-    description: "100% pima · DK · Paleta coral / miel / oliva",
-    category: "lanas",
-    image:
-      "https://source.unsplash.com/600x450/?cotton,yarn",
-    imageAlt: "Madejas de algodón pima en colores suaves",
-  },
-  {
-    title: "Kit Bucket minimal",
-    price: "$38.000",
-    tag: "Entrega 48h",
-    description: "Nivel básico · Crochet 5mm · Patrón descargable",
-    category: "kits",
-    image:
-      "https://source.unsplash.com/600x450/?crochet,yarn",
-    imageAlt: "Set de crochet con madejas listas para tejer",
-  },
-  {
-    title: "Bloqueadores metálicos",
-    price: "$21.990",
-    tag: "Premium",
-    description: "Acero inoxidable · Set 30 piezas · Estuche lino",
-    category: "accesorios",
-    image:
-      "https://source.unsplash.com/600x450/?wool,yarn,needles",
-    imageAlt: "Madejas y herramientas de tejido",
-  },
-];
+let products = [];
 
 const productGrid = document.querySelector("#productGrid");
 const filterChips = document.querySelectorAll(".chip");
+let activeFilter = "todos";
 
 const renderProducts = (filter = "todos") => {
   const fragment = document.createDocumentFragment();
-  products
-    .filter((item) => filter === "todos" || item.category === filter)
-    .forEach((product) => {
+  const filtered = products.filter((item) => filter === "todos" || item.category === filter);
+  if (!filtered.length) {
+    const empty = document.createElement("div");
+    empty.className = "product-card";
+    empty.innerHTML = `<p class="lead">Aún no hay productos en esta categoría.</p>`;
+    fragment.appendChild(empty);
+  } else {
+    filtered.forEach((product) => {
       const card = document.createElement("article");
       card.className = "product-card";
+      const imgSrc = product.image || product.imageData || product.imageUrl || "";
+      const priceText = typeof product.price === "number"
+        ? `$${Number(product.price).toLocaleString("es-CL")}`
+        : (product.price || "");
+      const tagText = product.tag || (product.stock === 0 ? "Agotado" : "");
+      const tagClass = product.stock === 0 ? "tag stock-out" : "tag";
+      const descText = product.description || product.notes || "";
+
       card.innerHTML = `
         <div class="product-media">
-          <img src="${product.image}" alt="${product.imageAlt}" loading="lazy" />
+          ${imgSrc ? `<img src="${imgSrc}" alt="${product.imageAlt || product.title}" loading="lazy" />` : ""}
         </div>
         <div class="title-line">
           <h3>${product.title}</h3>
-          <span class="price">${product.price}</span>
+          <span class="price">${priceText}</span>
         </div>
-        <p class="tag">${product.tag}</p>
-        <p class="lead">${product.description}</p>
+        ${tagText ? `<p class="${tagClass}">${tagText}</p>` : ""}
+        ${descText ? `<p class="lead">${descText}</p>` : ""}
         <button class="pill-button ghost small">Añadir a mi bolsa</button>
       `;
       fragment.appendChild(card);
     });
+  }
   productGrid.innerHTML = "";
   productGrid.appendChild(fragment);
 };
@@ -95,8 +49,9 @@ const renderProducts = (filter = "todos") => {
 const handleFilterClick = (event) => {
   const { filter } = event.target.dataset;
   if (!filter) return;
+  activeFilter = filter;
   filterChips.forEach((chip) => chip.classList.toggle("active", chip === event.target));
-  renderProducts(filter);
+  renderProducts(activeFilter);
 };
 
 filterChips.forEach((chip) => chip.addEventListener("click", handleFilterClick));
@@ -148,7 +103,32 @@ const formatter = new Intl.DateTimeFormat("es-CL", {
 });
 buildStamp.textContent = formatter.format(new Date());
 
-renderProducts();
+async function fetchCatalog() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/products`);
+    if (!res.ok) throw new Error("No se pudo obtener el catálogo");
+    const { products: list } = await res.json();
+    if (Array.isArray(list)) {
+      products = list;
+      renderProducts(activeFilter);
+      return;
+    }
+  } catch (e) {
+    console.warn("Catálogo remoto no disponible", e);
+  }
+  // Si no hay datos, deja el grid con un mensaje
+  products = [];
+  renderProducts(activeFilter);
+}
+
+fetchCatalog();
+
+// Auto-actualiza el catálogo cada 5 minutos cuando la pestaña está visible
+setInterval(() => {
+  if (document.visibilityState === "visible") {
+    fetchCatalog();
+  }
+}, 300000);
 
 // Acceso oculto al panel admin:
 // Atajo de teclado: Ctrl/Cmd + Alt + A

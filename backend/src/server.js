@@ -7,7 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(cors());
-app.use(express.json());
+// Aumenta límite para permitir imágenes comprimidas en dataURL
+app.use(express.json({ limit: "2mb" }));
 app.use(morgan("tiny"));
 
 app.get("/healthz", (req, res) =>

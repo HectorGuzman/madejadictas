@@ -87,9 +87,14 @@
             </select>
           </label>
           <label>
-            URL de foto (opcional)
-            <input type="url" name="image" placeholder="https://..." />
+            Foto del producto (requerida)
+            <input id="photoInput" type="file" accept="image/*" capture="environment" required />
           </label>
+          <div id="photoPreview" class="inventory-panel" hidden>
+            <strong>Vista previa</strong>
+            <img id="photoPreviewImg" alt="Vista previa de la foto" style="max-width:100%;border-radius:0.5rem;border:1px solid var(--line)" />
+            <span id="photoMeta" style="font-size:0.85rem;color:var(--muted)"></span>
+          </div>
           <label>
             Notas internas
             <textarea name="notes" rows="3" placeholder="Tintorera, lote, variaciones..."></textarea>

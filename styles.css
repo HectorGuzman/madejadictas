@@ -379,6 +379,11 @@ h3 {
   font-size: 0.8rem;
 }
 
+.tag.stock-out {
+  background: rgba(239, 62, 74, 0.18);
+  color: #8f3c1d;
+}
+
 .kits-section {
   background: linear-gradient(120deg, #fff0f5, #ffe7e2 60%);
   border-radius: 2rem;
@@ -693,9 +698,37 @@ dialog::backdrop {
   font-size: 0.9rem;
 }
 
+.inventory-panel .two-col input[type="number"] {
+  width: 100%;
+}
+
 .inventory-panel li span {
   color: var(--muted);
   font-size: 0.8rem;
+}
+
+/* Thumbnails para inventario admin */
+.inventory-panel .inv-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.inventory-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.inventory-thumb.placeholder {
+  background: linear-gradient(120deg, #fff0f5, #ffe7e2);
+}
+
+.inventory-panel .inv-meta strong {
+  display: block;
 }
 
 @media (max-width: 900px) {

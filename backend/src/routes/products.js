@@ -8,8 +8,7 @@ const router = Router();
 
 const toProduct = (doc) => ({ id: doc.id, ...doc.data() });
 
-// Protege todo el router con Google Sign-In
-router.use(verifyGoogle);
+// Nota: GET es público para el catálogo. POST/PATCH requieren Google y, opcionalmente, API Key.
 
 router.get("/", async (req, res, next) => {
   try {
@@ -39,6 +38,10 @@ const createHandler = async (req, res, next) => {
       stock: Number(req.body.stock),
     });
 
+    if (!parsed.image && !parsed.imageData) {
+      return res.status(400).json({ error: "Se requiere imagen" });
+    }
+
     const created = await productsCollection.add({
       ...parsed,
       owner: req.user?.email || "admin",
@@ -54,9 +57,9 @@ const createHandler = async (req, res, next) => {
 };
 
 if (requireApiKey) {
-  router.post("/", apiKeyGuard, createHandler);
+  router.post("/", verifyGoogle, apiKeyGuard, createHandler);
 } else {
-  router.post("/", createHandler);
+  router.post("/", verifyGoogle, createHandler);
 }
 
 const patchHandler = async (req, res, next) => {
@@ -83,9 +86,43 @@ const patchHandler = async (req, res, next) => {
 };
 
 if (requireApiKey) {
-  router.patch("/:id/stock", apiKeyGuard, patchHandler);
+  router.patch("/:id/stock", verifyGoogle, apiKeyGuard, patchHandler);
 } else {
-  router.patch("/:id/stock", patchHandler);
+  router.patch("/:id/stock", verifyGoogle, patchHandler);
+}
+
+// Patch genérico para actualizar precio/stock (y potencialmente otros campos controlados)
+const patchGenericHandler = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const update = {};
+    if (req.body.price !== undefined) {
+      const p = Number(req.body.price);
+      if (Number.isNaN(p) || p < 0) return res.status(400).json({ error: "Precio inválido" });
+      update.price = p;
+    }
+    if (req.body.stock !== undefined) {
+      const s = Number(req.body.stock);
+      if (Number.isNaN(s) || s < 0) return res.status(400).json({ error: "Stock inválido" });
+      update.stock = s;
+    }
+    if (!Object.keys(update).length) {
+      return res.status(400).json({ error: "Nada para actualizar" });
+    }
+    update.updatedAt = FieldValue.serverTimestamp();
+    const ref = productsCollection.doc(id);
+    await ref.update(update);
+    const snapshot = await ref.get();
+    res.json({ product: toProduct(snapshot) });
+  } catch (error) {
+    next(error);
+  }
+};
+
+if (requireApiKey) {
+  router.patch("/:id", verifyGoogle, apiKeyGuard, patchGenericHandler);
+} else {
+  router.patch("/:id", verifyGoogle, patchGenericHandler);
 }
 
 export default router;

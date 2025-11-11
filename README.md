@@ -8,6 +8,7 @@ Proyecto base estático listo para publicarse en GitHub Pages. Contiene hero res
 - `styles.css`: sistema de diseño (tipografías, grid responsivo, chips, paleta).
 - `script.js`: datos de ejemplo para el catálogo, filtros, diálogo de flujo y helpers (smooth scroll, sello de build, menú mobile).
 - `backend/`: API Express lista para Cloud Run + Cloud Firestore (`backend/README.md` tiene los pasos).
+- `admin.html` + `admin.js`: panel del equipo con login Google, carga de productos con foto comprimida y edición de precio/stock.
 
 ## Autenticación del equipo
 
