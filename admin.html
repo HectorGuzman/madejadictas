@@ -88,7 +88,8 @@
           </label>
           <label>
             Foto del producto (requerida)
-            <input id="photoInput" type="file" accept="image/*" capture="environment" required />
+            <input id="photoInput" type="file" accept="image/*" required />
+            <span class="helper-text">Puedes tomar una foto o elegir desde la galería.</span>
           </label>
           <div id="photoPreview" class="inventory-panel" hidden>
             <strong>Vista previa</strong>
@@ -143,7 +144,8 @@
         </label>
         <label>
           Fotos (máx 10)
-          <input id="showroomPhotos" type="file" accept="image/*" multiple capture="environment" required />
+          <input id="showroomPhotos" type="file" accept="image/*" multiple required />
+          <span class="helper-text">Selecciona varias desde la galería o toma nuevas fotos.</span>
         </label>
         <div id="showroomPreview" class="inventory-panel" hidden></div>
         <button type="submit" class="pill-button secondary small">Publicar showroom</button>
