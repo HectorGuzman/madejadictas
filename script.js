@@ -74,6 +74,7 @@ const accountProfile = document.querySelector("#accountProfile");
 const accountName = document.querySelector("#accountName");
 const accountEmail = document.querySelector("#accountEmail");
 const signOutLanding = document.querySelector("#signOutLanding");
+const goAdminButton = document.querySelector('#goAdminButton');
 // Guest checkout form
 const accountForm = document.querySelector('#accountForm');
 const useGoogleDataButton = document.querySelector('#useGoogleDataButton');
@@ -83,6 +84,11 @@ const accountSavedMsg = document.querySelector('#accountSavedMsg');
 const ACCOUNT_STORAGE_KEY = 'mdCustomer';
 
 let landingUser = null;
+const ADMIN_EMAILS_LANDING = [
+  'claudia.sepulveda.s@gmail.com',
+  'carla@madejadictas.com',
+  'hectorguzmancortes@gmail.com',
+].map(e => e.toLowerCase());
 
 function parseJwt(token) {
   try {
@@ -108,9 +114,14 @@ function updateAccountUI() {
   if (isAuth) {
     accountName.textContent = landingUser.name || landingUser.email;
     accountEmail.textContent = landingUser.email || "";
+    if (goAdminButton) {
+      const isAdmin = ADMIN_EMAILS_LANDING.includes((landingUser.email || '').toLowerCase());
+      goAdminButton.hidden = !isAdmin;
+    }
   } else {
     accountName.textContent = "";
     accountEmail.textContent = "";
+    if (goAdminButton) goAdminButton.hidden = true;
   }
   // El formulario siempre está visible (tanto invitada como logeada)
   // Prefill si hay datos guardados
