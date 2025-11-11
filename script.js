@@ -408,7 +408,6 @@ async function fetchCatalog() {
 }
 
 fetchCatalog();
-fetchShowrooms();
 
 // Auto-actualiza el catálogo cada 5 minutos cuando la pestaña está visible
 setInterval(() => {
@@ -476,6 +475,9 @@ showroomGrid?.addEventListener('click', (e) => {
   const id = card.getAttribute('data-srid');
   if (id) openShowroomById(id);
 });
+
+// Llama tras definir todo el módulo de showrooms
+fetchShowrooms();
 
 // Acceso oculto al panel admin:
 // Atajo de teclado: Ctrl/Cmd + Alt + A
