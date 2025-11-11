@@ -13,6 +13,12 @@
   font-size: clamp(15px, 0.95rem + 0.2vw, 18px);
 }
 
+/* Asegura que los elementos con atributo hidden no se muestren,
+   incluso si alguna regla les asigna display */
+[hidden] {
+  display: none !important;
+}
+
 *,
 *::before,
 *::after {
