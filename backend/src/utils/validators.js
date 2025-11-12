@@ -117,3 +117,27 @@ export const showroomSchema = z
       }
     });
   });
+
+// Noticias: título y texto requeridos, imagen opcional (dataURL o URL)
+export const newsSchema = z
+  .object({
+    title: z.string().min(3),
+    text: z.string().min(10).max(2000),
+    image: z
+      .string()
+      .url()
+      .optional()
+      .or(z.literal("").transform(() => undefined)),
+    imageData: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.imageData) {
+      const ok = data.imageData.startsWith("data:image/");
+      if (!ok) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["imageData"], message: "Formato de imagen inválido" });
+      }
+      if (data.imageData.length > 1_500_000) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["imageData"], message: "La imagen es muy pesada (máx ~1.5MB)" });
+      }
+    }
+  });

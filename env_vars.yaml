@@ -1,7 +1,7 @@
 # Env vars for Cloud Run (madejadictas-api)
 # Edit GOOGLE_CLIENT_ID con tu valor real y ajusta ALLOWED_ADMINS
 
-ALLOWED_ADMINS: "claudia.sepulveda.s@gmail.com,carlastirado@gmail.com,hectorguzmancortes@gmail.com"
+ALLOWED_ADMINS: "claudia.sepulveda.s@gmail.com,carla@madejadictas.com,carlastirado@gmail.com,hectorguzmancortes@gmail.com"
 GOOGLE_CLIENT_ID: "754600563497-i9qjck33s0ckffnea75pnc6uoatrf6fn.apps.googleusercontent.com"
 ENFORCE_ADMIN_API_KEY: "false"
 ADMIN_API_KEY: "lanas-colores-2024"

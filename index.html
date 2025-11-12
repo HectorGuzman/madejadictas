@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>madejadictas® | Insumos para tejido y kits creativos</title>
+    <link rel="icon" href="assets/instagram_rose_gold.svg" type="image/svg+xml" />
     <meta
       name="description"
       content="Catálogo online de madejadictas®: lanas, hilos, accesorios y kits para tejedoras. Compra como invitada o inicia sesión con Google."
@@ -44,7 +45,7 @@
         </a>
         <a
           class="icon wa"
-          href="https://wa.me/56912345678?text=Hola%20madejadictas%20%F0%9F%8E%BC"
+          href="https://wa.me/56985889315?text=Hola%20madejadictas%2C%20estoy%20viendo%20lanas%20en%20madejadictas.cl%20y%20necesito%20consultar%20por%20disponibilidad%2C%20colores%20y%20env%C3%ADos."
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp de madejadictas"
@@ -80,18 +81,17 @@
           <div class="hero-badges">
             <div>
               <span class="badge-number">Más de 2 años</span>
-              <p>de encuentros donde conversamos y somos felices viendo lanas</p>
+              <p>de showrooms presenciales donde conversamos, vemos proyectos, tocamos lanas y, por supuesto, comemos rico.</p>
             </div>
             <div>
               <span class="badge-number">Despachos a todo Chile</span>
-              <p>con atención y asesoría de sus dueñas</p>
+              <p>Envíos ágiles y seguros, con asesoría personalizada de sus dueñas para elegir fibras, colores y herramientas ideales. Compra con confianza: te acompañamos hasta que tu proyecto esté en tus palillos.</p>
             </div>
           </div>
         </div>
-        <div class="hero-card" id="showroomHero">
-          <h3>Último showroom</h3>
-          <p>Muy pronto destacaremos fotos y detalles de nuestro encuentro más reciente.</p>
-          <button class="pill-button ghost small" data-scroll="#showrooms">Ver showrooms</button>
+        <div class="hero-card" id="newsHero">
+          <h3>Noticias</h3>
+          <p>Pronto compartiremos novedades, fechas y sorpresas de madejadictas®.</p>
         </div>
       </section>
 
@@ -122,7 +122,7 @@
         <div class="product-grid" id="showroomGrid"></div>
       </section>
 
-      <dialog id="showroomDialog">
+    <dialog id="showroomDialog">
         <div class="dialog-content showroom">
           <div class="dialog-head">
             <h3 id="srTitle">Showroom</h3>
@@ -301,6 +301,16 @@
         <button class="pill-button primary small" id="closeDialog">
           Cerrar
         </button>
+      </div>
+    </dialog>
+
+    <dialog id="productImageDialog">
+      <div class="dialog-content">
+        <div class="dialog-head">
+          <h3 id="piTitle">Imagen del producto</h3>
+          <button class="close-button" id="piClose" aria-label="Cerrar imagen">×</button>
+        </div>
+        <img id="piImg" alt="Imagen de producto" />
       </div>
     </dialog>
 

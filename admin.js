@@ -65,6 +65,7 @@ const renderInventory = () => {
         <div class="inv-meta">
           <strong>${item.title}</strong>
           <span>Categoría: ${item.category}</span>
+          <span class="helper-text">ID interno: ${item.id}</span>
         </div>
       </div>
       <div class="two-col">
@@ -83,6 +84,7 @@ const renderInventory = () => {
       </div>
       <div>
         <button class="pill-button secondary small save-item">Guardar cambios</button>
+        <button class="pill-button ghost small edit-item">Editar</button>
       </div>
       ${item.notes ? `<span>Notas: ${item.notes}</span>` : ""}
       <span>Registrado por ${item.owner || "Equipo"} el ${item.createdAt}</span>
@@ -100,6 +102,8 @@ const updateAdminUI = () => {
   googleButtonContainer.style.display = isAuth ? "none" : "flex";
   const showroomForm = document.getElementById('showroomForm');
   if (showroomForm) showroomForm.hidden = !isAuth;
+  const newsForm = document.getElementById('newsForm');
+  if (newsForm) newsForm.hidden = !isAuth;
 };
 
 const configureApiKey = () => {
@@ -249,39 +253,151 @@ clearInventoryButton.addEventListener("click", () => {
 // Actualización inline de precio/stock
 inventoryList.addEventListener("click", async (e) => {
   const btn = e.target.closest(".save-item");
-  if (!btn) return;
-  const li = btn.closest("li");
-  const id = li?.dataset?.id;
-  if (!id) return;
-  const priceEl = li.querySelector(".inv-price");
-  const stockEl = li.querySelector(".inv-stock");
-  const price = Number(priceEl?.value);
-  const stock = Number(stockEl?.value);
-  if (Number.isNaN(price) || price < 0 || Number.isNaN(stock) || stock < 0) {
-    alert("Revisa los valores de precio y stock.");
+  if (btn) {
+    const li = btn.closest("li");
+    const id = li?.dataset?.id;
+    if (!id) return;
+    const priceEl = li.querySelector(".inv-price");
+    const stockEl = li.querySelector(".inv-stock");
+    const price = Number(priceEl?.value);
+    const stock = Number(stockEl?.value);
+    if (Number.isNaN(price) || price < 0 || Number.isNaN(stock) || stock < 0) {
+      alert("Revisa los valores de precio y stock.");
+      return;
+    }
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      };
+      if (adminKey) headers[ADMIN_HEADER] = adminKey;
+      const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ price, stock }),
+      });
+      if (!res.ok) throw new Error("No se pudo actualizar el producto");
+      const { product } = await res.json();
+      const idx = inventory.findIndex((p) => p.id === id);
+      if (idx >= 0) {
+        inventory[idx] = { ...inventory[idx], price: product.price, stock: product.stock };
+      }
+      renderInventory();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Error actualizando");
+    }
     return;
   }
-  try {
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${idToken}`,
-    };
-    if (adminKey) headers[ADMIN_HEADER] = adminKey;
-    const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
-      method: "PATCH",
-      headers,
-      body: JSON.stringify({ price, stock }),
-    });
-    if (!res.ok) throw new Error("No se pudo actualizar el producto");
-    const { product } = await res.json();
-    const idx = inventory.findIndex((p) => p.id === id);
-    if (idx >= 0) {
-      inventory[idx] = { ...inventory[idx], price: product.price, stock: product.stock };
+  const editBtn = e.target.closest('.edit-item');
+  if (editBtn) {
+    const li = editBtn.closest('li');
+    const id = li?.dataset?.id;
+    if (!id) return;
+    openEditDialog(id);
+  }
+});
+
+// Diálogo de edición completa
+const editDialog = document.getElementById('editProductDialog');
+const editClose = document.getElementById('editClose');
+const editForm = document.getElementById('editProductForm');
+const editCategory = document.getElementById('editCategory');
+const editYarnFields = document.getElementById('editYarnFields');
+const editLWField = document.getElementById('editLWField');
+const editPhotoInput = document.getElementById('editPhotoInput');
+let editId = null;
+
+function updateEditCategoryFields() {
+  const isYarn = editCategory?.value === 'hilados';
+  if (editYarnFields) editYarnFields.hidden = !isYarn;
+  if (editLWField) editLWField.hidden = !isYarn;
+}
+editCategory?.addEventListener('change', updateEditCategoryFields);
+
+function openEditDialog(id) {
+  const item = inventory.find((p) => p.id === id);
+  if (!item) return;
+  editId = id;
+  // Prefill
+  const els = editForm?.elements || {};
+  if (editCategory) editCategory.value = item.category || 'accesorios';
+  if (els['title']) els['title'].value = item.title || '';
+  if (els['price']) els['price'].value = item.price ?? 0;
+  if (els['stock']) els['stock'].value = item.stock ?? 0;
+  if (els['thickness']) els['thickness'].value = item.thickness || '';
+  if (els['composition']) els['composition'].value = item.composition || '';
+  if (els['lengthWeight']) els['lengthWeight'].value = item.lengthWeight || '';
+  if (els['tags']) els['tags'].value = Array.isArray(item.tags) ? item.tags.join(' ') : '';
+  if (els['notes']) els['notes'].value = item.notes || '';
+  updateEditCategoryFields();
+  editDialog.showModal();
+}
+
+editClose?.addEventListener('click', () => editDialog?.close());
+
+editForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!editId) return;
+  const data = Object.fromEntries(new FormData(editForm).entries());
+  const payload = {
+    title: data.title?.trim(),
+    category: data.category,
+    price: Number(data.price),
+    stock: Number(data.stock),
+    notes: data.notes?.trim(),
+  };
+  if (payload.category === 'hilados') {
+    payload.thickness = data.thickness?.trim();
+    payload.composition = data.composition?.trim();
+    payload.lengthWeight = data.lengthWeight?.trim();
+  } else {
+    payload.thickness = undefined;
+    payload.composition = undefined;
+    payload.lengthWeight = undefined;
+  }
+  if (data.tags) {
+    payload.tags = String(data.tags)
+      .split(/\s+/)
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+  // Foto opcional nueva
+  if (editPhotoInput && editPhotoInput.files && editPhotoInput.files[0]) {
+    try {
+      const dataUrl = await compressImageToDataURL(editPhotoInput.files[0], 1280, 1280, 0.72);
+      payload.imageData = dataUrl;
+    } catch (err) {
+      console.error(err);
+      alert('No pudimos procesar la foto nueva.');
+      return;
     }
+  }
+  try {
+    const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` };
+    if (adminKey) headers[ADMIN_HEADER] = adminKey;
+    const res = await fetch(`${API_BASE_URL}/api/products/${editId}/full`, {
+      method: 'PATCH', headers, body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (res.status === 404) {
+        alert('No se pudo guardar: producto no encontrado o ruta "/full" no disponible en el backend. Recargaremos el inventario.');
+        await fetchInventoryFromBackend();
+        return;
+      }
+      const msg = (data && (data.error || data.message)) || 'No se pudo guardar cambios';
+      throw new Error(msg);
+    }
+    const { product } = await res.json();
+    const idx = inventory.findIndex((p) => p.id === editId);
+    if (idx >= 0) inventory[idx] = { ...inventory[idx], ...product };
     renderInventory();
+    editDialog.close();
   } catch (err) {
     console.error(err);
-    alert(err.message || "Error actualizando");
+    alert(err.message || 'Error guardando cambios');
   }
 });
 
@@ -470,6 +586,58 @@ if (showroomForm) {
     } catch (err) {
       console.error(err);
       alert(err.message || 'Error publicando showroom');
+    }
+  });
+}
+
+// Noticias: opcional 1 foto + creación
+const newsPhoto = document.getElementById('newsPhoto');
+const newsPreview = document.getElementById('newsPreview');
+const newsForm = document.getElementById('newsForm');
+
+if (newsPhoto) {
+  newsPhoto.addEventListener('change', async () => {
+    const file = newsPhoto.files && newsPhoto.files[0];
+    newsPreview.innerHTML = '';
+    if (!file) { newsPreview.hidden = true; return; }
+    try {
+      const dataUrl = await compressImageToDataURL(file, 1000, 1000, 0.7);
+      const sizeKB = dataURLSizeKB(dataUrl);
+      const block = document.createElement('div');
+      block.style.display = 'flex';
+      block.style.alignItems = 'center';
+      block.style.gap = '0.5rem';
+      block.innerHTML = `
+        <img src="${dataUrl}" alt="preview" class="inventory-thumb" />
+        <span class="helper-text">${file.name} • ~${sizeKB.toFixed(0)} KB</span>
+      `;
+      newsPreview.appendChild(block);
+      newsPreview.hidden = false;
+    } catch {}
+  });
+}
+
+if (newsForm) {
+  newsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentUser || !idToken) { alert('Inicia sesión con Google'); return; }
+    const data = Object.fromEntries(new FormData(newsForm).entries());
+    const payload = { title: data.title?.trim(), text: data.text?.trim() };
+    if (!payload.title || !payload.text) { alert('Completa título y texto'); return; }
+    if (newsPhoto && newsPhoto.files && newsPhoto.files[0]) {
+      try { payload.imageData = await compressImageToDataURL(newsPhoto.files[0], 1200, 1200, 0.72); } catch {}
+    }
+    try {
+      const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` };
+      if (adminKey) headers[ADMIN_HEADER] = adminKey;
+      const res = await fetch(`${API_BASE_URL}/api/news`, { method: 'POST', headers, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error('No se pudo publicar la noticia');
+      newsForm.reset();
+      if (newsPreview) { newsPreview.innerHTML = ''; newsPreview.hidden = true; }
+      alert('Noticia publicada');
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Error publicando noticia');
     }
   });
 }

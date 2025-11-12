@@ -4,6 +4,7 @@ import morgan from "morgan";
 import productsRouter from "./routes/products.js";
 import ordersRouter from "./routes/orders.js";
 import showroomsRouter from "./routes/showrooms.js";
+import newsRouter from "./routes/news.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -20,6 +21,7 @@ app.get("/healthz", (req, res) =>
 app.use("/api/products", productsRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/showrooms", showroomsRouter);
+app.use("/api/news", newsRouter);
 
 app.use((err, req, res, next) => {
   if (err.name === "ZodError") {

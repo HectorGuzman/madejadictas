@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>madejadictas® · Panel</title>
+    <link rel="icon" href="assets/instagram_rose_gold.svg" type="image/svg+xml" />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,9 +23,7 @@
           <p>Panel de catálogo</p>
         </div>
       </div>
-      <nav class="main-nav">
-        <a href="index.html">Volver al sitio</a>
-      </nav>
+      <a href="index.html" class="pill-button ghost small admin-back">Volver</a>
     </header>
 
     <main style="padding-top:2rem">
@@ -57,6 +56,14 @@
         </div>
 
         <form id="productForm" class="admin-form" hidden>
+          <label>
+            Categoría
+            <select name="category" id="categorySelect" required>
+              <option value="">Selecciona</option>
+              <option value="hilados">Hilados</option>
+              <option value="accesorios">Accesorios</option>
+            </select>
+          </label>
           <div class="two-col">
             <label>
               Nombre del producto
@@ -73,14 +80,6 @@
               <input type="number" name="stock" min="0" required />
             </label>
           </div>
-          <label>
-            Categoría
-            <select name="category" id="categorySelect" required>
-              <option value="">Selecciona</option>
-              <option value="hilados">Hilados</option>
-              <option value="accesorios">Accesorios</option>
-            </select>
-          </label>
           <label>
             Foto del producto (requerida)
             <input id="photoInput" type="file" accept="image/*" required />
@@ -130,6 +129,66 @@
       </section>
     </main>
 
+    <!-- Dialogo de edición rápida de producto -->
+    <dialog id="editProductDialog">
+      <div class="dialog-content admin">
+        <div class="dialog-head">
+          <h3>Editar producto</h3>
+          <button class="close-button" id="editClose" aria-label="Cerrar">×</button>
+        </div>
+        <form id="editProductForm" class="admin-form">
+          <div class="two-col">
+            <label>
+              Nombre del producto
+              <input type="text" name="title" required />
+            </label>
+            <label>
+              Categoría
+              <select name="category" id="editCategory" required>
+                <option value="hilados">Hilados</option>
+                <option value="accesorios">Accesorios</option>
+              </select>
+            </label>
+          </div>
+          <div class="two-col">
+            <label>
+              Precio (CLP)
+              <input type="number" name="price" inputmode="numeric" required />
+            </label>
+            <label>
+              Stock disponible
+              <input type="number" name="stock" min="0" required />
+            </label>
+          </div>
+          <div id="editYarnFields" class="two-col">
+            <label>
+              Grosor
+              <input type="text" name="thickness" />
+            </label>
+            <label>
+              Composición
+              <input type="text" name="composition" />
+            </label>
+          </div>
+          <label id="editLWField">
+            Metros / gramos
+            <input type="text" name="lengthWeight" />
+          </label>
+          <label>
+            Tags (separa por espacios)
+            <input type="text" name="tags" />
+          </label>
+          <label>
+            Cambiar foto (opcional)
+            <input id="editPhotoInput" type="file" accept="image/*" />
+          </label>
+          <div class="team-actions">
+            <button type="submit" class="pill-button secondary small">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
     <section class="account-section" style="margin:1rem">
       <div class="section-heading">
         <p class="eyebrow">Eventos</p>
@@ -161,7 +220,31 @@
           <span class="helper-text">Selecciona varias desde la galería o toma nuevas fotos.</span>
         </label>
         <div id="showroomPreview" class="inventory-panel" hidden></div>
-        <button type="submit" class="pill-button secondary small">Publicar showroom</button>
+      <button type="submit" class="pill-button secondary small">Publicar showroom</button>
+      </form>
+    </section>
+
+    <section class="account-section" style="margin:1rem">
+      <div class="section-heading">
+        <p class="eyebrow">Comunicaciones</p>
+        <h2>Publicar noticia</h2>
+        <p>Solo equipo: crea una noticia con título, texto y foto opcional (se mostrará la última en el hero).</p>
+      </div>
+      <form id="newsForm" class="admin-form" hidden>
+        <label>
+          Título
+          <input type="text" name="title" required />
+        </label>
+        <label>
+          Texto
+          <textarea name="text" rows="4" placeholder="Escribe la novedad" required></textarea>
+        </label>
+        <label>
+          Foto (opcional)
+          <input id="newsPhoto" type="file" accept="image/*" />
+        </label>
+        <div id="newsPreview" class="inventory-panel" hidden></div>
+        <button type="submit" class="pill-button secondary small">Publicar noticia</button>
       </form>
     </section>
 

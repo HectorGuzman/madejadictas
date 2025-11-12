@@ -270,6 +270,21 @@ productGrid.addEventListener('click', (e) => {
   if (id) addToCart(id, 1);
 });
 
+// Ampliar imagen de producto al hacer click
+const piDialog = document.getElementById('productImageDialog');
+const piImg = document.getElementById('piImg');
+const piClose = document.getElementById('piClose');
+productGrid.addEventListener('click', (e) => {
+  const img = e.target.closest('.product-media img');
+  if (!img) return;
+  if (piImg && piDialog) {
+    piImg.src = img.getAttribute('src');
+    piImg.alt = img.getAttribute('alt') || 'Imagen de producto';
+    piDialog.showModal();
+  }
+});
+piClose?.addEventListener('click', () => piDialog?.close());
+
 document.getElementById('cartList')?.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-remove-item]');
   if (!btn) return;
@@ -383,29 +398,38 @@ const formatter = new Intl.DateTimeFormat("es-CL", {
 });
 buildStamp.textContent = formatter.format(new Date());
 
-// Rellena la tarjeta de "Más vendido" en el hero
-function renderShowroomHero() {
-  const holder = document.querySelector('#showroomHero');
+// Rellena la tarjeta del hero con la última noticia
+let latestNews = null;
+function renderNewsHero() {
+  const holder = document.querySelector('#newsHero');
   if (!holder) return;
-  if (!Array.isArray(showroomsData) || showroomsData.length === 0) {
+  if (!latestNews) {
     holder.innerHTML = `
-      <h3>Último showroom</h3>
-      <p>Muy pronto destacaremos fotos y detalles de nuestro encuentro más reciente.</p>
-      <button class="pill-button ghost small" data-scroll="#showrooms">Ver showrooms</button>
-    `;
+      <h3>Noticias</h3>
+      <p>Pronto compartiremos novedades, fechas y sorpresas de madejadictas®.</p>`;
     return;
   }
-  const s = showroomsData[0];
-  const cover = s.cover || (s.photos && s.photos[0]) || '';
+  const { title, text, image, imageData } = latestNews;
+  const cover = image || imageData || '';
   holder.innerHTML = `
-    <h3>Último showroom</h3>
-    <div class="product-media" style="margin:0.5rem 0 0.75rem">
-      ${cover ? `<img src="${cover}" alt="${s.title}" loading="lazy" />` : ''}
-    </div>
-    <p class="lead" style="margin:0">${s.title}</p>
-    <p class="tag" style="margin:0.25rem 0">${s.date || ''} ${s.location ? '• ' + s.location : ''}</p>
-    <button class="pill-button ghost small" data-scroll="#showrooms">Ver showrooms</button>
+    <h3>Noticias</h3>
+    ${cover ? `<div class=\"product-media\" style=\"margin:0.5rem 0 0.75rem\"><img src=\"${cover}\" alt=\"${title}\" loading=\"lazy\" /></div>` : ''}
+    <p class=\"lead\" style=\"margin:0\">${title}</p>
+    ${text ? `<p style=\"margin:0.25rem 0 0\">${text}</p>` : ''}
   `;
+}
+
+async function fetchNews() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/news?limit=1`);
+    if (!res.ok) throw new Error('No se pudo cargar noticias');
+    const { news } = await res.json();
+    latestNews = Array.isArray(news) && news.length ? news[0] : null;
+    renderNewsHero();
+  } catch (e) {
+    latestNews = null;
+    renderNewsHero();
+  }
 }
 
 async function fetchCatalog() {
@@ -495,8 +519,9 @@ showroomGrid?.addEventListener('click', (e) => {
   if (id) openShowroomById(id);
 });
 
-// Llama tras definir todo el módulo de showrooms
+// Llama tras definir todo el módulo de showrooms y noticias
 fetchShowrooms();
+fetchNews();
 
 // Acceso oculto al panel admin:
 // Atajo de teclado: Ctrl/Cmd + Alt + A
@@ -553,12 +578,10 @@ async function fetchShowrooms() {
     const { showrooms } = await res.json();
     showroomsData = Array.isArray(showrooms) ? showrooms : [];
     renderShowrooms(showroomsData);
-    renderShowroomHero();
   } catch (e) {
     console.warn('Showrooms no disponibles', e);
     showroomsData = [];
     renderShowrooms([]);
-    renderShowroomHero();
   }
 }
 

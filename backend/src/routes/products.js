@@ -125,4 +125,50 @@ if (requireApiKey) {
   router.patch("/:id", verifyGoogle, patchGenericHandler);
 }
 
+// PATCH completo: mezcla con el documento actual, valida y actualiza
+const toArrayTags = (tags) => {
+  if (!tags) return undefined;
+  if (Array.isArray(tags)) return tags.filter(Boolean);
+  return String(tags)
+    .split(/\s+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+};
+
+const patchFullHandler = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    // Normaliza campos numéricos y de tags
+    const incoming = { ...req.body };
+    if (incoming.price !== undefined) incoming.price = Number(incoming.price);
+    if (incoming.stock !== undefined) incoming.stock = Number(incoming.stock);
+    if (incoming.tags !== undefined) incoming.tags = toArrayTags(incoming.tags);
+
+    const ref = productsCollection.doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: "Producto no existe" });
+    const current = snap.data();
+    // Muestra final que queremos persistir
+    const merged = { ...current, ...incoming };
+    // Validación completa
+    productSchema.parse(merged);
+
+    await ref.update({
+      ...incoming,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    const updated = await ref.get();
+    res.json({ product: toProduct(updated) });
+  } catch (error) {
+    if (error.name === "ZodError") return res.status(400).json({ error: error.errors });
+    next(error);
+  }
+};
+
+if (requireApiKey) {
+  router.patch("/:id/full", verifyGoogle, apiKeyGuard, patchFullHandler);
+} else {
+  router.patch("/:id/full", verifyGoogle, patchFullHandler);
+}
+
 export default router;
