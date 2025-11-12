@@ -29,8 +29,8 @@ const renderProducts = (filter = "todos") => {
       const priceText = typeof product.price === "number"
         ? `$${Number(product.price).toLocaleString("es-CL")}`
         : (product.price || "");
-      const tagText = product.tag || (product.stock === 0 ? "Agotado" : "");
-      const tagClass = product.stock === 0 ? "tag stock-out" : "tag";
+      const tags = Array.isArray(product.tags) ? product.tags : [];
+      const stockTag = product.stock === 0 ? 'Agotado' : '';
       const descText = product.description || product.notes || "";
 
       card.innerHTML = `
@@ -41,8 +41,16 @@ const renderProducts = (filter = "todos") => {
           <h3>${product.title}</h3>
           <span class="price">${priceText}</span>
         </div>
-        ${tagText ? `<p class="${tagClass}">${tagText}</p>` : ""}
+        ${stockTag ? `<p class="tag stock-out">${stockTag}</p>` : ""}
         ${descText ? `<p class="lead">${descText}</p>` : ""}
+        ${product.category === 'hilados' ? `
+          <ul class="lead" style="margin:0.25rem 0; padding-left:1rem">
+            ${product.thickness ? `<li>Grosor: ${product.thickness}</li>` : ''}
+            ${product.composition ? `<li>Composición: ${product.composition}</li>` : ''}
+            ${product.lengthWeight ? `<li>Metros/gramos: ${product.lengthWeight}</li>` : ''}
+          </ul>
+        ` : ''}
+        ${tags.length ? `<div>${tags.map(t => `<span class=\"tag\">${t}</span>`).join(' ')}</div>` : ''}
         <button class="pill-button ghost small" data-add-to-cart data-id="${product.id}">Añadir a mi bolsa</button>
       `;
       fragment.appendChild(card);

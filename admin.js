@@ -64,7 +64,7 @@ const renderInventory = () => {
           : `<div class="inventory-thumb placeholder" aria-hidden="true"></div>`}
         <div class="inv-meta">
           <strong>${item.title}</strong>
-          <span>SKU: ${item.sku} · ${item.category}</span>
+          <span>Categoría: ${item.category}</span>
         </div>
       </div>
       <div class="two-col">
@@ -173,14 +173,13 @@ productForm.addEventListener("submit", async (e) => {
   const entry = Object.fromEntries(formData.entries());
   const payload = {
     title: entry.title?.trim(),
-    sku: entry.sku?.trim(),
     price: Number(entry.price),
     stock: Number(entry.stock),
     category: entry.category,
     notes: entry.notes?.trim(),
   };
-  if (!payload.title || !payload.sku || Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
-    alert("Completa nombre, SKU, precio y stock antes de guardar.");
+  if (!payload.title || Number.isNaN(payload.price) || Number.isNaN(payload.stock)) {
+    alert("Completa nombre, precio y stock antes de guardar.");
     return;
   }
   if (!payload.notes) delete payload.notes;
@@ -198,6 +197,20 @@ productForm.addEventListener("submit", async (e) => {
     console.error(err);
     alert('No pudimos procesar la foto. Intenta con otra imagen.');
     return;
+  }
+
+  // Campos por categoría
+  if (payload.category === 'hilados') {
+    payload.thickness = entry.thickness?.trim();
+    payload.composition = entry.composition?.trim();
+    payload.lengthWeight = entry.lengthWeight?.trim();
+  }
+  // Tags
+  if (entry.tags) {
+    payload.tags = String(entry.tags)
+      .split(/\s+/)
+      .map((t) => t.trim())
+      .filter(Boolean);
   }
 
   try {
@@ -460,3 +473,16 @@ if (showroomForm) {
     }
   });
 }
+
+// Mostrar/Ocultar campos de Hilados según categoría
+const categorySelect = document.getElementById('categorySelect');
+const yarnFields = document.getElementById('yarnFields');
+const lwField = document.getElementById('lwField');
+function updateCategoryFields() {
+  const val = categorySelect?.value;
+  const isYarn = val === 'hilados';
+  if (yarnFields) yarnFields.hidden = !isYarn;
+  if (lwField) lwField.hidden = !isYarn;
+}
+categorySelect?.addEventListener('change', updateCategoryFields);
+updateCategoryFields();

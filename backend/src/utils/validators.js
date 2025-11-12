@@ -3,16 +3,32 @@ import { z } from "zod";
 export const productSchema = z
   .object({
     title: z.string().min(3),
-    sku: z.string().min(2),
+    sku: z.string().min(2).optional(),
     price: z.number().nonnegative(),
     stock: z.number().int().nonnegative(),
-    category: z.enum(["lanas", "kits", "accesorios"]),
+    category: z.enum(["hilados", "accesorios"]),
     image: z
       .string()
       .url()
       .optional()
       .or(z.literal("").transform(() => undefined)),
     imageData: z.string().optional(), // data URL (image/jpeg|png|webp)
+    // Campos específicos de hilados
+    thickness: z.string().optional(),
+    composition: z.string().optional(),
+    lengthWeight: z.string().optional(),
+    // Tags puede llegar como string o array
+    tags: z
+      .union([z.string(), z.array(z.string())])
+      .optional()
+      .transform((v) => {
+        if (!v) return undefined;
+        if (Array.isArray(v)) return v.filter(Boolean);
+        return v
+          .split(/\s+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }),
     notes: z.string().max(500).optional(),
   })
   .superRefine((data, ctx) => {
@@ -32,12 +48,23 @@ export const productSchema = z
           message: "Formato de imagen inválido",
         });
       }
-      if (data.imageData.length > 1_000_000) {
+      if (data.imageData.length > 1_500_000) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["imageData"],
-          message: "La imagen es muy pesada (máx ~1MB)",
+          message: "La imagen es muy pesada (máx ~1.5MB)",
         });
+      }
+    }
+    if (data.category === "hilados") {
+      if (!data.thickness) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["thickness"], message: "Grosor es requerido" });
+      }
+      if (!data.composition) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["composition"], message: "Composición es requerida" });
+      }
+      if (!data.lengthWeight) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["lengthWeight"], message: "Metros/gramos es requerido" });
       }
     }
   });

@@ -62,10 +62,6 @@
               Nombre del producto
               <input type="text" name="title" required />
             </label>
-            <label>
-              SKU / Código
-              <input type="text" name="sku" required />
-            </label>
           </div>
           <div class="two-col">
             <label>
@@ -79,10 +75,9 @@
           </div>
           <label>
             Categoría
-            <select name="category" required>
+            <select name="category" id="categorySelect" required>
               <option value="">Selecciona</option>
-              <option value="lanas">Lanas</option>
-              <option value="kits">Kits</option>
+              <option value="hilados">Hilados</option>
               <option value="accesorios">Accesorios</option>
             </select>
           </label>
@@ -96,6 +91,24 @@
             <img id="photoPreviewImg" alt="Vista previa de la foto" style="max-width:100%;border-radius:0.5rem;border:1px solid var(--line)" />
             <span id="photoMeta" style="font-size:0.85rem;color:var(--muted)"></span>
           </div>
+          <div id="yarnFields" class="two-col" hidden>
+            <label>
+              Grosor
+              <input type="text" name="thickness" placeholder="Ej: Fingering, DK, Worsted" />
+            </label>
+            <label>
+              Composición
+              <input type="text" name="composition" placeholder="Ej: 100% merino, 70% alpaca 30% nylon" />
+            </label>
+          </div>
+          <label id="lwField" hidden>
+            Metros / gramos
+            <input type="text" name="lengthWeight" placeholder="Ej: 200m / 100g" />
+          </label>
+          <label>
+            Tags (separa por espacios)
+            <input type="text" name="tags" placeholder="ej: degradé merino teñido_a_mano" />
+          </label>
           <label>
             Notas internas
             <textarea name="notes" rows="3" placeholder="Tintorera, lote, variaciones..."></textarea>
