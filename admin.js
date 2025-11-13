@@ -169,10 +169,6 @@ productForm.addEventListener("submit", async (e) => {
     alert("Inicia sesión con Google para publicar productos.");
     return;
   }
-  if (!adminKey) {
-    configureApiKey();
-    if (!adminKey) return;
-  }
   const formData = new FormData(e.target);
   const entry = Object.fromEntries(formData.entries());
   const payload = {
@@ -236,6 +232,33 @@ productForm.addEventListener("submit", async (e) => {
     if (preview) preview.hidden = true;
     alert("Producto enviado al backend de madejadictas®.");
   } catch (err) {
+    // Si falla y aún no tenemos adminKey, solicita y reintenta una vez
+    if (!adminKey) {
+      console.warn('Primer intento sin API key falló, solicitando clave y reintentando...', err);
+      configureApiKey();
+      if (adminKey) {
+        try {
+          const { product } = await saveProductRemote(payload);
+          const storedItem = {
+            ...product,
+            owner: currentUser.name || currentUser.email,
+            createdAt: new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short" }).format(new Date()),
+          };
+          inventory = [storedItem, ...inventory];
+          localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+          renderInventory();
+          e.target.reset();
+          const preview = document.getElementById('photoPreview');
+          if (preview) preview.hidden = true;
+          alert("Producto enviado al backend de madejadictas®.");
+          return;
+        } catch (err2) {
+          console.error(err2);
+          alert(err2.message || "No pudimos guardar el producto, intenta nuevamente.");
+          return;
+        }
+      }
+    }
     console.error(err);
     alert(err.message || "No pudimos guardar el producto, intenta nuevamente.");
   }

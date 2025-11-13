@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>madejadictas® · Mi bolsa</title>
+    <link rel="icon" href="assets/instagram_rose_gold.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="logo">
+        <a href="index.html" aria-label="Inicio">
+          <img src="assets/logo.JPG" alt="Logo original de madejadictas®" />
+        </a>
+        <div>
+          <strong>madejadictas®</strong>
+          <p>Mi bolsa</p>
+        </div>
+      </div>
+      <nav class="main-nav">
+        <a href="index.html#productos">Productos</a>
+        <a href="index.html#showrooms">Showrooms</a>
+        <a href="index.html#creadoras">Creadoras</a>
+      </nav>
+      <a href="index.html#productos" class="pill-button ghost small" title="Seguir comprando">Seguir comprando</a>
+      <div class="social-icons">
+        <a class="icon ig" href="https://instagram.com/madejadictas" target="_blank" rel="noopener noreferrer" aria-label="Instagram de madejadictas" title="Instagram">
+          <img src="assets/instagram_rose_gold.svg" alt="Instagram" class="icon-img" />
+        </a>
+        <a class="icon wa" href="https://wa.me/56985889315?text=Hola%20madejadictas%2C%20estoy%20viendo%20lanas%20en%20madejadictas.cl%20y%20necesito%20consultar%20por%20disponibilidad%2C%20colores%20y%20env%C3%ADos." target="_blank" rel="noopener noreferrer" aria-label="WhatsApp de madejadictas" title="WhatsApp">
+          <img src="assets/whatsapp_rose_gold.svg" alt="WhatsApp" class="icon-img" />
+        </a>
+      </div>
+      <button class="menu-toggle" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <main>
+      <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+      <section class="account-section">
+        <div class="section-heading">
+          <p class="eyebrow">Finaliza tu compra</p>
+          <h2>Ingresa con Google o sigue como invitada</h2>
+          <p>
+            Guarda tus datos para el despacho y confirma tu pedido cuando estés lista. Si prefieres, inicia sesión con Google para completar más rápido.
+          </p>
+        </div>
+        <div class="account-actions">
+          <div id="googleButtonContainerCart"></div>
+          <button class="pill-button secondary large" id="guestCheckoutButtonCart">Comprar como invitada</button>
+        </div>
+        <div id="accountProfileCart" class="inventory-panel" hidden>
+          <p class="admin-status" style="margin:0">Conectada como <strong id="accountNameCart"></strong></p>
+          <span id="accountEmailCart" style="font-size:0.9rem;color:var(--muted)"></span>
+          <div class="team-actions" style="margin-top:0.5rem">
+            <button class="pill-button ghost small" id="signOutCart">Cerrar sesión</button>
+          </div>
+        </div>
+
+        <form id="accountFormCart" class="admin-form" aria-label="Datos para despacho" hidden>
+          <div class="two-col">
+            <label>Nombre completo<input type="text" name="fullName" autocomplete="name" required /></label>
+            <label>Email<input type="email" name="email" autocomplete="email" required /></label>
+          </div>
+          <div class="two-col">
+            <label>Teléfono<input type="tel" name="phone" autocomplete="tel" /></label>
+            <label>Región<input type="text" name="region" placeholder="Ej: Coquimbo" /></label>
+          </div>
+          <div class="two-col">
+            <label>Dirección<input type="text" name="address" autocomplete="street-address" required /></label>
+            <label>Comuna<input type="text" name="city" placeholder="Ej: La Serena" /></label>
+          </div>
+          <label>Notas para el despacho<textarea name="notes" rows="3" placeholder="Depto, referencias, horario, etc."></textarea></label>
+          <div class="team-actions">
+            <button type="submit" class="pill-button secondary small">Guardar datos</button>
+            <button type="button" class="pill-button ghost small" id="useGoogleDataCart">Usar datos de Google</button>
+            <button type="button" class="pill-button ghost small" id="clearAccountCart">Borrar datos</button>
+          </div>
+          <p id="accountSavedMsgCart" class="helper-text" aria-live="polite"></p>
+        </form>
+
+        <section id="cartPanelCart" class="inventory-panel">
+          <div class="inventory-head">
+            <h4>Mi bolsa</h4>
+            <button class="pill-button ghost small" id="clearCartCart">Vaciar</button>
+          </div>
+          <ul id="cartListCart"></ul>
+          <div class="team-actions">
+            <button class="pill-button primary" id="checkoutCart">Confirmar pedido</button>
+            <span id="checkoutMsgCart" class="helper-text" aria-live="polite"></span>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer minimal">
+      <p class="footer-center">madejadictas® · La Serena / Coquimbo</p>
+      <p class="footer-love">Esta página fue creada con amor para el amor de mi vida: nunca dejes de soñar.</p>
+    </footer>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="cart.js" defer></script>
+  </body>
+  </html>

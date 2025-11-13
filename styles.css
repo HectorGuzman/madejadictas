@@ -130,6 +130,26 @@ button {
   display: block;
 }
 
+.social-icons .icon.cart {
+  position: relative;
+  color: var(--rose-gold);
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  display: grid;
+  place-items: center;
+}
+
 .social-icons .icon.ig svg {
   fill: var(--accent);
 }
@@ -584,6 +604,52 @@ h3 {
   text-decoration: underline;
 }
 
+/* Proveedoras */
+.brands {
+  background: var(--card);
+  border-radius: 2rem;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 40px rgba(217, 160, 127, 0.1);
+}
+
+.brands-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.brand-card {
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1rem;
+  height: 120px;
+  box-shadow: 0 10px 20px rgba(217,160,127,0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.brand-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(217,160,127,0.14);
+  border-color: rgba(239, 62, 74, 0.25);
+}
+
+.brand-card img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid var(--rose-gold);
+  background: #fff;
+  padding: 6px;
+  object-fit: contain;
+  display: block;
+  box-shadow: 0 8px 20px rgba(217, 160, 127, 0.25);
+}
+
 .account-section {
   background: linear-gradient(135deg, #fff, rgba(255, 214, 210, 0.5));
   border-radius: 2rem;
@@ -647,6 +713,25 @@ h3 {
   text-align: right;
   font-size: 0.85rem;
   color: var(--accent-dark);
+}
+
+/* Footer minimal centrado */
+.site-footer.minimal {
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-center {
+  margin: 0;
+  text-align: center;
+}
+
+.footer-love {
+  margin: 3rem 0 0; /* mucho más abajo */
+  text-align: center;
+  font-size: 0.7rem; /* más pequeño */
+  color: var(--muted);
+  opacity: 0.75;
 }
 
 dialog {
@@ -825,6 +910,44 @@ dialog::backdrop {
 /* Cart simple */
 #cartPanel {
   margin-top: 1rem;
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.toast {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(90vw, 380px);
+}
+
+.toast .toast-action {
+  margin-left: auto;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Cart icon bump animation */
+.cart-bump { animation: cart-bump 300ms ease; }
+@keyframes cart-bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 
 @media (max-width: 900px) {

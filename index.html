@@ -30,7 +30,6 @@
         <a href="#productos">Productos</a>
         <a href="#showrooms">Showrooms</a>
         <a href="#creadoras">Creadoras</a>
-        <a href="#login">Mi cuenta</a>
       </nav>
       <div class="social-icons">
         <a
@@ -53,16 +52,25 @@
         >
           <img src="assets/whatsapp_rose_gold.svg" alt="WhatsApp" class="icon-img" />
         </a>
+        <a
+          class="icon cart"
+          href="cart.html"
+          aria-label="Abrir mi bolsa"
+          title="Mi bolsa"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path fill="currentColor" d="M7 7V6a5 5 0 0 1 10 0v1h2a1 1 0 0 1 .99 1.141l-1.6 11A2 2 0 0 1 16.41 21H7.59a2 2 0 0 1-1.98-1.859l-1.6-11A1 1 0 0 1 5 7h2Zm2 0h6V6a3 3 0 0 0-6 0v1Z"/>
+          </svg>
+          <span class="cart-count" id="cartCount" aria-label="Ítems en la bolsa"></span>
+        </a>
       </div>
-      <button class="pill-button ghost header-cta" data-scroll="#productos">
-        Ver catálogo
-      </button>
       <button class="menu-toggle" aria-label="Abrir menú">
         <span></span><span></span><span></span>
       </button>
     </header>
 
     <main>
+      <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
       <section class="hero">
         <div class="hero-content">
           <p class="eyebrow">Selección continua · stock limitado</p>
@@ -70,6 +78,7 @@
             Todo lo que necesitas para
             <span class="accent">tejer sin enredos.</span>
           </h1>
+          <button class="pill-button primary" data-scroll="#productos">Ver catálogo</button>
           <p class="lead">
             Lanas premium de teñidoras chilenas, kits curados, accesorios y
             artículos que acompañan el tejer para que cada sesión sea cómoda,
@@ -121,6 +130,8 @@
         </div>
         <div class="product-grid" id="showroomGrid"></div>
       </section>
+
+      
 
     <dialog id="showroomDialog">
         <div class="dialog-content showroom">
@@ -185,110 +196,43 @@
         </div>
       </section>
 
-      <section class="account-section" id="login">
+      <section class="brands" id="proveedoras">
         <div class="section-heading">
-          <p class="eyebrow">Compra cómo prefieras</p>
-          <h2>Ingresa con Google o sigue como invitada</h2>
-          <p>
-            El login permite guardar direcciones, listas de favoritos y seguir
-            el progreso de tus proyectos. También puedes comprar rápido como
-            invitada sin crear cuenta.
-          </p>
+          <p class="eyebrow">Aliadas creativas</p>
+          <h2>Proveedoras</h2>
+          <p>Trabajamos junto a marcas que admiramos. Toca sus logos para visitarlas en Instagram.</p>
         </div>
-        <div class="account-actions">
-          <div id="googleButtonContainerLanding"></div>
-          <button class="pill-button secondary large" id="guestCheckoutButton">
-            Comprar como invitada
-          </button>
+        <div class="brands-grid">
+          <a class="brand-card" href="https://www.instagram.com/mienredo?igsh=MTcwMGhpbjM5MmczZg==" target="_blank" rel="noopener noreferrer" aria-label="Mi Enredo en Instagram">
+            <img src="assets/proveedoras/mienredo.JPG" alt="Mi Enredo" loading="lazy" />
+          </a>
+          <a class="brand-card" href="https://www.instagram.com/nicky_bijoux.cl?igsh=d3pwZzVoZmFyZHd6" target="_blank" rel="noopener noreferrer" aria-label="Nicky Bijoux en Instagram">
+            <img src="assets/proveedoras/nickyBijoux.JPG" alt="Nicky Bijoux" loading="lazy" />
+          </a>
+          <a class="brand-card" href="https://www.instagram.com/ma.lanas?igsh=MTVpd2E0MTl5Nm03eQ==" target="_blank" rel="noopener noreferrer" aria-label="MaLanas en Instagram">
+            <img src="assets/proveedoras/maLanas.JPG" alt="MaLanas" loading="lazy" />
+          </a>
+          <a class="brand-card" href="https://www.instagram.com/lialanas?igsh=ZTRkNTh3Y3h3NGQx" target="_blank" rel="noopener noreferrer" aria-label="Lialanas en Instagram">
+            <img src="assets/proveedoras/liaLanas.JPG" alt="Lialanas" loading="lazy" />
+          </a>
+          <a class="brand-card" href="https://www.instagram.com/baikmux_hilados?igsh=MWpnMnZpN2RzZGk2bg==" target="_blank" rel="noopener noreferrer" aria-label="Baikmux en Instagram">
+            <img src="assets/proveedoras/baikmux.JPG" alt="Baikmux" loading="lazy" />
+          </a>
+          <a class="brand-card" href="https://www.instagram.com/marmotrin?igsh=NWhlNGl5MnM0eDVx" target="_blank" rel="noopener noreferrer" aria-label="Marmotrin en Instagram">
+            <img src="assets/proveedoras/marmotrin.png" alt="Marmotrin" loading="lazy" />
+          </a>
+          <a class="brand-card" href="https://www.instagram.com/tejeritas?igsh=enRrMmxvam95MWVn" target="_blank" rel="noopener noreferrer" aria-label="Tejeritas en Instagram">
+            <img src="assets/proveedoras/tejeritas.JPG" alt="Tejeritas" loading="lazy" />
+          </a>
         </div>
-        <div id="accountProfile" class="inventory-panel" hidden>
-          <p class="admin-status" style="margin:0">
-            Conectada como <strong id="accountName"></strong>
-          </p>
-          <span id="accountEmail" style="font-size:0.9rem;color:var(--muted)"></span>
-          <div class="team-actions" style="margin-top:0.5rem">
-            <button class="pill-button ghost small" id="signOutLanding">Cerrar sesión</button>
-            <a href="admin.html" class="pill-button secondary small" id="goAdminButton" hidden>Ir al panel admin</a>
-          </div>
-        </div>
-
-        <form id="accountForm" class="admin-form" aria-label="Datos para despacho" hidden>
-          <div class="two-col">
-            <label>
-              Nombre completo
-              <input type="text" name="fullName" autocomplete="name" required />
-            </label>
-            <label>
-              Email
-              <input type="email" name="email" autocomplete="email" required />
-            </label>
-          </div>
-          <div class="two-col">
-            <label>
-              Teléfono
-              <input type="tel" name="phone" autocomplete="tel" />
-            </label>
-            <label>
-              Región
-              <input type="text" name="region" placeholder="Ej: Coquimbo" />
-            </label>
-          </div>
-          <div class="two-col">
-            <label>
-              Dirección
-              <input type="text" name="address" autocomplete="street-address" required />
-            </label>
-            <label>
-              Comuna
-              <input type="text" name="city" placeholder="Ej: La Serena" />
-            </label>
-          </div>
-          <label>
-            Notas para el despacho
-            <textarea name="notes" rows="3" placeholder="Depto, referencias, horario, etc."></textarea>
-          </label>
-          <div class="team-actions">
-            <button type="submit" class="pill-button secondary small">Guardar datos</button>
-            <button type="button" class="pill-button ghost small" id="useGoogleDataButton">Usar datos de Google</button>
-            <button type="button" class="pill-button ghost small" id="clearAccountButton">Borrar datos</button>
-          </div>
-          <p id="accountSavedMsg" class="helper-text" aria-live="polite"></p>
-        </form>
-
-        <section id="cartPanel" class="inventory-panel">
-          <div class="inventory-head">
-            <h4>Mi bolsa</h4>
-            <button class="pill-button ghost small" id="clearCartButton">Vaciar</button>
-          </div>
-          <ul id="cartList"></ul>
-          <div class="team-actions">
-            <button class="pill-button primary" id="checkoutButton">Confirmar pedido</button>
-            <span id="checkoutMsg" class="helper-text" aria-live="polite"></span>
-          </div>
-        </section>
       </section>
+
+      
     </main>
 
-    <footer class="site-footer">
-      <div>
-        <strong>madejadictas®</strong>
-        <p>La Serena / Coquimbo · Envíos por pagar a todo Chile</p>
-      </div>
-      <div class="footer-links">
-        <a href="#">Políticas</a>
-        <a href="#">Preguntas frecuentes</a>
-        <a href="mailto:hola@madejadictas.com">hola@madejadictas.com</a>
-        <a
-          href="https://instagram.com/madejadictas"
-          target="_blank"
-          rel="noopener noreferrer"
-          >@madejadictas</a
-        >
-      </div>
-      <p class="footer-note">
-        Catálogo listo para GitHub Pages • Actualizado
-        <span id="buildStamp"></span>
-      </p>
+    <footer class="site-footer minimal">
+      <p class="footer-center">madejadictas® · La Serena / Coquimbo</p>
+      <p class="footer-love">Página creada con cariño por Claudia y Carla — que nunca falte la inspiración para tejer.</p>
     </footer>
 
     <dialog id="flowDialog">

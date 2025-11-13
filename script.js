@@ -41,7 +41,9 @@ const renderProducts = (filter = "todos") => {
           <h3>${product.title}</h3>
           <span class="price">${priceText}</span>
         </div>
-        ${stockTag ? `<p class="tag stock-out">${stockTag}</p>` : ""}
+        ${Number(product.stock) === 0
+          ? `<p class=\"tag stock-out\">Agotado</p>`
+          : (Number.isFinite(Number(product.stock)) ? `<p class=\"tag\">Stock: ${product.stock}</p>` : "")}
         ${descText ? `<p class="lead">${descText}</p>` : ""}
         ${product.category === 'hilados' ? `
           <ul class="lead" style="margin:0.25rem 0; padding-left:1rem">
@@ -51,7 +53,10 @@ const renderProducts = (filter = "todos") => {
           </ul>
         ` : ''}
         ${tags.length ? `<div>${tags.map(t => `<span class=\"tag\">${t}</span>`).join(' ')}</div>` : ''}
-        <button class="pill-button ghost small" data-add-to-cart data-id="${product.id}">Añadir a mi bolsa</button>
+        <div class="add-controls" style="display:flex; gap:0.5rem; align-items:center; margin-top:0.5rem;">
+          <input class="qty-input" type="number" min="1" max="${Number(product.stock ?? 99)}" value="1" ${product.stock===0?'disabled':''} style="width:70px; padding:0.4rem; border:1px solid var(--line); border-radius:0.5rem;" />
+          <button class="pill-button ghost small" data-add-to-cart data-id="${product.id}" ${product.stock===0?'disabled':''}>Añadir a mi bolsa</button>
+        </div>
       `;
       fragment.appendChild(card);
     });
@@ -224,15 +229,38 @@ function saveCart(cart) { localStorage.setItem(CART_KEY, JSON.stringify(cart)); 
 function addToCart(productId, qty = 1) {
   const cart = loadCart();
   const existing = cart.find((it) => it.productId === productId);
-  if (existing) existing.quantity += qty; else cart.push({ productId, quantity: qty });
+  const prod = products.find((p) => p.id === productId);
+  const stock = Number(prod?.stock ?? Infinity);
+  if (existing) {
+    const next = Math.min(stock, Number(existing.quantity || 0) + Number(qty || 0));
+    existing.quantity = next;
+  } else {
+    const initQty = Math.min(stock, Number(qty || 1));
+    if (initQty <= 0) return;
+    cart.push({ productId, quantity: initQty });
+  }
   saveCart(cart);
   renderCart();
+  // Feedback visual
+  const name = prod?.title || 'Producto';
+  showToast(`Agregamos ${qty} × ${name} a tu bolsa`, {
+    actionText: 'Ver bolsa',
+    actionHref: 'cart.html'
+  });
+  // Animación del ícono de carrito
+  try {
+    const cartIcon = document.querySelector('.icon.cart');
+    cartIcon?.classList.add('cart-bump');
+    setTimeout(() => cartIcon?.classList.remove('cart-bump'), 320);
+  } catch {}
 }
 function removeFromCart(productId) { saveCart(loadCart().filter((it) => it.productId !== productId)); renderCart(); }
 function renderCart() {
   const listEl = document.getElementById('cartList');
-  if (!listEl) return;
   const cart = loadCart();
+  // Actualiza contador del header siempre
+  updateHeaderCartCount();
+  if (!listEl) return;
   listEl.innerHTML = '';
   if (!cart.length) {
     const li = document.createElement('li');
@@ -261,13 +289,26 @@ function renderCart() {
       </div>`;
     listEl.appendChild(line);
   });
+  updateHeaderCartCount();
 }
 
 productGrid.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-add-to-cart]');
   if (!btn) return;
   const id = btn.getAttribute('data-id');
-  if (id) addToCart(id, 1);
+  if (!id) return;
+  let qty = 1;
+  const wrapper = btn.closest('.add-controls');
+  const input = wrapper?.querySelector('.qty-input');
+  if (input) {
+    const val = Number(input.value);
+    qty = Number.isNaN(val) || val < 1 ? 1 : Math.floor(val);
+  }
+  const prod = products.find((p) => p.id === id);
+  const max = Number(prod?.stock ?? 99);
+  if (qty > max) qty = max;
+  if (max <= 0) return;
+  addToCart(id, qty);
 });
 
 // Ampliar imagen de producto al hacer click
@@ -298,6 +339,48 @@ document.getElementById('clearCartButton')?.addEventListener('click', () => {
 });
 
 renderCart();
+
+function updateHeaderCartCount() {
+  const el = document.getElementById('cartCount');
+  if (!el) return;
+  const total = (loadCart() || []).reduce((acc, it) => acc + Number(it.quantity || 0), 0);
+  el.textContent = total > 0 ? String(total) : '';
+}
+updateHeaderCartCount();
+
+// Toast helpers
+function ensureToastContainer() {
+  let c = document.getElementById('toastContainer');
+  if (!c) {
+    c = document.createElement('div');
+    c.id = 'toastContainer';
+    c.className = 'toast-container';
+    document.body.appendChild(c);
+  }
+  return c;
+}
+
+function showToast(message, opts = {}) {
+  const c = ensureToastContainer();
+  const el = document.createElement('div');
+  el.className = 'toast';
+  const text = document.createElement('span');
+  text.textContent = message;
+  el.appendChild(text);
+  if (opts.actionText && opts.actionHref) {
+    const a = document.createElement('a');
+    a.href = opts.actionHref;
+    a.textContent = opts.actionText;
+    a.className = 'toast-action';
+    el.appendChild(a);
+  }
+  c.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 200ms ease';
+    setTimeout(() => el.remove(), 220);
+  }, 2500);
+}
 
 document.getElementById('checkoutButton')?.addEventListener('click', async () => {
   const msg = document.getElementById('checkoutMsg');
@@ -392,11 +475,10 @@ const nav = document.querySelector(".main-nav");
 menuToggle.addEventListener("click", () => nav.classList.toggle("open"));
 
 const buildStamp = document.querySelector("#buildStamp");
-const formatter = new Intl.DateTimeFormat("es-CL", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-buildStamp.textContent = formatter.format(new Date());
+if (buildStamp) {
+  const formatter = new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short" });
+  buildStamp.textContent = formatter.format(new Date());
+}
 
 // Rellena la tarjeta del hero con la última noticia
 let latestNews = null;
