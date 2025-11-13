@@ -963,6 +963,7 @@ dialog::backdrop {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
+    z-index: 10; /* por debajo del toggle */
   }
 
   .main-nav.open {
@@ -973,6 +974,8 @@ dialog::backdrop {
   .menu-toggle {
     display: inline-flex;
     margin-left: auto;
+    position: relative;
+    z-index: 20; /* por encima del menú desplegado */
   }
 
   .header-cta {

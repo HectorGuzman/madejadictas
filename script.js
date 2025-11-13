@@ -472,7 +472,28 @@ if (clearAccountButton) {
 
 const menuToggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".main-nav");
-menuToggle.addEventListener("click", () => nav.classList.toggle("open"));
+function setMenuOpen(open) {
+  if (!nav || !menuToggle) return;
+  nav.classList.toggle('open', open);
+  menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+menuToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  setMenuOpen(!nav.classList.contains('open'));
+});
+// Cierra al hacer click en un enlace del menú
+nav.addEventListener('click', (e) => {
+  if (e.target.closest('a')) setMenuOpen(false);
+});
+// Cierra al hacer click fuera del menú
+document.addEventListener('click', (e) => {
+  if (!nav.classList.contains('open')) return;
+  if (!e.target.closest('.main-nav') && !e.target.closest('.menu-toggle')) setMenuOpen(false);
+});
+// Cierra con ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') setMenuOpen(false);
+});
 
 const buildStamp = document.querySelector("#buildStamp");
 if (buildStamp) {
