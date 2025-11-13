@@ -983,6 +983,21 @@ dialog::backdrop {
   }
 }
 
+/* Backdrop para el menú móvil */
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 27, 22, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 8; /* debajo del menú (10) y del toggle (20) */
+}
+.nav-backdrop.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
 @media (max-width: 640px) {
   .site-header {
     flex-wrap: wrap;

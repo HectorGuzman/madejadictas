@@ -472,23 +472,37 @@ if (clearAccountButton) {
 
 const menuToggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".main-nav");
+let navBackdrop = null;
+function ensureBackdrop() {
+  if (!navBackdrop) {
+    navBackdrop = document.createElement('div');
+    navBackdrop.className = 'nav-backdrop';
+    document.body.appendChild(navBackdrop);
+    navBackdrop.addEventListener('click', () => setMenuOpen(false));
+  }
+  return navBackdrop;
+}
 function setMenuOpen(open) {
   if (!nav || !menuToggle) return;
   nav.classList.toggle('open', open);
   menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  const bd = ensureBackdrop();
+  bd.classList.toggle('open', open);
 }
 menuToggle.addEventListener('click', (e) => {
   e.stopPropagation();
   setMenuOpen(!nav.classList.contains('open'));
 });
-// Cierra al hacer click en un enlace del menú
+// Cierra al hacer click en un enlace del menú y hace scroll suave si es ancla
 nav.addEventListener('click', (e) => {
-  if (e.target.closest('a')) setMenuOpen(false);
-});
-// Cierra al hacer click fuera del menú
-document.addEventListener('click', (e) => {
-  if (!nav.classList.contains('open')) return;
-  if (!e.target.closest('.main-nav') && !e.target.closest('.menu-toggle')) setMenuOpen(false);
+  const a = e.target.closest('a');
+  if (!a) return;
+  const href = a.getAttribute('href') || '';
+  setMenuOpen(false);
+  if (href.startsWith('#')) {
+    e.preventDefault();
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+  }
 });
 // Cierra con ESC
 document.addEventListener('keydown', (e) => {
