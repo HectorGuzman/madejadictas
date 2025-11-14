@@ -63,6 +63,8 @@ const renderProducts = (filter = "todos") => {
   }
   productGrid.innerHTML = "";
   productGrid.appendChild(fragment);
+  // Ajusta aspecto de las imágenes según su tamaño real (1:1, 16:9, etc.)
+  applyDynamicAspectToGrid();
 };
 
 const handleFilterClick = (event) => {
@@ -347,6 +349,25 @@ function updateHeaderCartCount() {
   el.textContent = total > 0 ? String(total) : '';
 }
 updateHeaderCartCount();
+
+// Ajusta dinámicamente el aspect-ratio de cada tarjeta de producto según la foto
+function applyDynamicAspectToGrid() {
+  const imgs = document.querySelectorAll('#productGrid .product-media img');
+  imgs.forEach((img) => {
+    const wrapper = img.closest('.product-media');
+    if (!wrapper) return;
+    const setRatio = () => {
+      if (!img.naturalWidth || !img.naturalHeight) return;
+      // Fija el aspect-ratio con las dimensiones reales
+      wrapper.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+    };
+    if (img.complete) {
+      setRatio();
+    } else {
+      img.addEventListener('load', setRatio, { once: true });
+    }
+  });
+}
 
 // Toast helpers
 function ensureToastContainer() {

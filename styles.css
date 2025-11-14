@@ -440,6 +440,7 @@ h3 {
 .product-media {
   width: 100%;
   aspect-ratio: 4 / 3;
+  max-height: 240px; /* evita que una foto muy apaisada/vertical ocupe toda la pantalla */
   border-radius: 1rem;
   overflow: hidden;
   background: #fff;
@@ -1025,4 +1026,7 @@ dialog::backdrop {
 
   /* Header minimalista en móvil: ocultar CTA secundario */
   .header-cta { display: none; }
+
+  /* Imágenes de producto un poco más compactas en móvil */
+  .product-media { max-height: 200px; }
 }
